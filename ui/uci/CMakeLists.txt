@@ -4,3 +4,9 @@ add_library(chess_uci STATIC
 
 target_include_directories(chess_uci PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_SOURCE_DIR})
 target_link_libraries(chess_uci PUBLIC chess_game chess_movegen chess_search chess_eval)
+
+add_executable(chess_uci_exe
+  main.cc
+)
+target_link_libraries(chess_uci_exe PRIVATE chess_uci)
+

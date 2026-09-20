@@ -1,6 +1,7 @@
 #include "uci.h"
 #include <memory>
 #include "movegen/board.h"
+#include "search/iterative_deepener.h"
 #include "movegen/movegen.h"
 #include "search/search.h"
 #include "eval/eval.h"
@@ -15,7 +16,7 @@ class Engine::Impl {
  public:
   Board board;
   Options opts;
-  Search<MaterialEvaluator> searcher{MaterialEvaluator{}};
+  IterativeDeepener<MaterialEvaluator> deepener{MaterialEvaluator{}};
   std::string last_best_move;
   bool stopped = false;
 };
@@ -54,8 +55,12 @@ void Engine::position(const std::string& fen, const std::vector<std::string>& mo
 
 void Engine::go(int depth) {
   impl_->stopped = false;
-  int d = depth > 0 ? depth : impl_->opts.depth;
-  auto res = impl_->searcher.search(impl_->board, d);
+  int maxDepth = depth > 0 ? depth : impl_->opts.depth;
+  auto res = impl_->deepener.search(impl_->board, maxDepth, [&](int d, int score, int nodes, Move best){
+    if (!impl_->stopped) {
+      std::cout << "info depth " << d << " score cp " << score << " nodes " << nodes << " bestmove " << best.to_string() << "\n";
+    }
+  });
   impl_->last_best_move = res.best_move.to_string();
 }
 
