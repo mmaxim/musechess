@@ -28,8 +28,9 @@ add_executable(tests
   movegen/board_test.cc
   movegen/movegen_test.cc
   search/search_test.cc
-  game/game_test.cc)
-target_link_libraries(tests PRIVATE chess_movegen chess_eval chess_search chess_game GTest::gtest GTest::gtest_main)
+  game/game_test.cc
+  ui/uci/uci_test.cc)
+target_link_libraries(tests PRIVATE chess_movegen chess_eval chess_search chess_game chess_uci GTest::gtest GTest::gtest_main)
 
 enable_testing()
 add_test(NAME tests COMMAND tests)
