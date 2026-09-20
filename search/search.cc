@@ -12,6 +12,7 @@ template <typename Evaluator>
 SearchResult Search<Evaluator>::search(Board& b, int depth) {
   nodes_ = 0;
   Move pv[kMaxDepth];
+  for (int i = 0; i < kMaxDepth; ++i) pv[i] = Move{};
   int alpha = std::numeric_limits<int>::min();
   int beta = std::numeric_limits<int>::max();
   int score = negamax_internal(b, depth, alpha, beta, pv, 0);
@@ -29,6 +30,9 @@ SearchResult Search<Evaluator>::search(Board& b, int depth) {
 
 template <typename Evaluator>
 int Search<Evaluator>::negamax_internal(Board& b, int depth, int alpha, int beta, Move* pv, int ply) {
+  if (stop_flag_ && stop_flag_->load()) {
+    return 0;
+  }
   ++nodes_;
   if (depth == 0) {
     return evaluator_.evaluate(b);
@@ -45,6 +49,7 @@ int Search<Evaluator>::negamax_internal(Board& b, int depth, int alpha, int beta
   int best = std::numeric_limits<int>::min();
   Move best_move{};
   for (auto& m : moves) {
+    if (stop_flag_ && stop_flag_->load()) break;
     Board child = b;
     child.make_move(m);
     Move child_pv[kMaxDepth];
@@ -53,7 +58,7 @@ int Search<Evaluator>::negamax_internal(Board& b, int depth, int alpha, int beta
       best = score;
       best_move = m;
       // copy child PV into current PV
-      for (int i = 0; i < kMaxDepth - ply - 1; ++i) {
+      for (int i = 0; i < depth - 1 && i < kMaxDepth; ++i) {
         pv[ply + 1 + i] = child_pv[ply + 1 + i];
       }
     }

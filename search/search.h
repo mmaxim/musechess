@@ -7,6 +7,7 @@
 #include <functional>
 #include <limits>
 #include <vector>
+#include <atomic>
 
 namespace chess {
 
@@ -38,10 +39,13 @@ class Search {
 
   SearchResult search(Board& b, int depth);
 
+  void set_stop_flag(std::atomic<bool>* flag) { stop_flag_ = flag; }
+
  private:
   Evaluator evaluator_;
   int nodes_ = 0;
   static constexpr int kMaxDepth = 64;
+  std::atomic<bool>* stop_flag_ = nullptr;
 
   int negamax_internal(Board& b, int depth, int alpha, int beta, Move* pv, int ply);
 };

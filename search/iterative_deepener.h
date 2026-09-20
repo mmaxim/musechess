@@ -9,6 +9,8 @@ class IterativeDeepener {
  public:
   explicit IterativeDeepener(Evaluator eval) : search_(std::move(eval)) {}
 
+  void set_stop_flag(std::atomic<bool>* flag) { search_.set_stop_flag(flag); }
+
   SearchResult search(Board& b, int maxDepth) {
     SearchResult best{0, Move{}, 0};
     for (int d = 1; d <= maxDepth; ++d) {

@@ -8,6 +8,9 @@
 
 #include <sstream>
 #include <iostream>
+#include <thread>
+#include <atomic>
+#include <mutex>
 
 namespace chess {
 namespace uci {
@@ -18,11 +21,19 @@ class Engine::Impl {
   Options opts;
   IterativeDeepener<MaterialEvaluator> deepener{MaterialEvaluator{}};
   std::string last_best_move;
-  bool stopped = false;
+  std::atomic<bool> stopped{false};
+  std::thread search_thread;
+  std::mutex mtx;
+  std::function<void(const std::string&)> info_cb;
 };
 
 Engine::Engine() : impl_(std::make_unique<Impl>()) {}
-Engine::~Engine() = default;
+Engine::~Engine() {
+  impl_->stopped = true;
+  if (impl_->search_thread.joinable()) {
+    impl_->search_thread.join();
+  }
+}
 
 void Engine::set_option(const std::string& key, const std::string& value) {
   if (key == "Depth") {
@@ -55,6 +66,8 @@ void Engine::position(const std::string& fen, const std::vector<std::string>& mo
 
 void Engine::go(int depth, bool infinite, std::function<void(const std::string&)> info_cb) {
   impl_->stopped = false;
+  impl_->info_cb = info_cb;
+  impl_->deepener.set_stop_flag(&impl_->stopped);
   int maxDepth = depth > 0 ? depth : impl_->opts.depth;
   auto send_info = [&](int d, const SearchResult& res){
     if (!impl_->stopped) {
@@ -68,13 +81,28 @@ void Engine::go(int depth, bool infinite, std::function<void(const std::string&)
     }
   };
   if (infinite) {
-    int d = 1;
-    while (!impl_->stopped) {
-      auto res = impl_->deepener.search_depth(impl_->board, d);
-      impl_->last_best_move = res.best_move.to_string();
-      send_info(d, res);
-      ++d;
+    // Run iterative deepening in a background thread so stop/quit can be processed
+    if (impl_->search_thread.joinable()) {
+      impl_->search_thread.join();
     }
+    impl_->search_thread = std::thread([this, send_info](){
+      int d = 1;
+      while (!impl_->stopped) {
+        // Use a local copy of board to avoid data race with position updates
+        Board board_copy;
+        {
+          std::lock_guard<std::mutex> lk(impl_->mtx);
+          board_copy = impl_->board;
+        }
+        auto res = impl_->deepener.search_depth(board_copy, d);
+        {
+          std::lock_guard<std::mutex> lk(impl_->mtx);
+          impl_->last_best_move = res.best_move.to_string();
+        }
+        send_info(d, res);
+        ++d;
+      }
+    });
     return;
   }
   for (int d = 1; d <= maxDepth; ++d) {
@@ -86,6 +114,9 @@ void Engine::go(int depth, bool infinite, std::function<void(const std::string&)
 
 void Engine::stop() {
   impl_->stopped = true;
+  if (impl_->search_thread.joinable()) {
+    impl_->search_thread.join();
+  }
 }
 
 std::string Engine::best_move() const {
