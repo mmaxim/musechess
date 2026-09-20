@@ -53,27 +53,29 @@ void Engine::position(const std::string& fen, const std::vector<std::string>& mo
   impl_->board = b;
 }
 
-void Engine::go(int depth, bool infinite) {
+void Engine::go(int depth, bool infinite, std::function<void(const std::string&)> info_cb) {
   impl_->stopped = false;
   int maxDepth = depth > 0 ? depth : impl_->opts.depth;
+  auto output_info = [&](int d, int score, int nodes, Move best){
+    if (!impl_->stopped) {
+      std::string s = "info depth " + std::to_string(d) + " score cp " + std::to_string(score) + " nodes " + std::to_string(nodes) + " pv " + best.to_string();
+      if (info_cb) info_cb(s);
+      else {
+        std::cout << s << "\n";
+        std::cout.flush();
+      }
+    }
+  };
   if (infinite) {
     int d = 1;
     while (!impl_->stopped) {
-      auto res = impl_->deepener.search(impl_->board, d, [&](int dd, int score, int nodes, Move best){
-        if (!impl_->stopped) {
-          std::cout << "info depth " << dd << " score cp " << score << " nodes " << nodes << " bestmove " << best.to_string() << "\n";
-        }
-      });
+      auto res = impl_->deepener.search(impl_->board, d, output_info);
       impl_->last_best_move = res.best_move.to_string();
       ++d;
     }
     return;
   }
-  auto res = impl_->deepener.search(impl_->board, maxDepth, [&](int d, int score, int nodes, Move best){
-    if (!impl_->stopped) {
-      std::cout << "info depth " << d << " score cp " << score << " nodes " << nodes << " bestmove " << best.to_string() << "\n";
-    }
-  });
+  auto res = impl_->deepener.search(impl_->board, maxDepth, output_info);
   impl_->last_best_move = res.best_move.to_string();
 }
 

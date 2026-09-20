@@ -2,23 +2,33 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <fstream>
 
 using namespace chess::uci;
 
+auto log_line = [](std::ofstream& log, const std::string& s){
+  std::cout << s << "\n";
+  log << s << "\n";
+  std::cout.flush();
+  log.flush();
+};
+
 int main() {
+  std::ofstream log("D:/AI/Projects/Chess/build/uci.log", std::ios::app);
   Engine engine;
   std::string line;
   while (std::getline(std::cin, line)) {
+    log_line(log, "> " + line);
     std::istringstream iss(line);
     std::string cmd;
     iss >> cmd;
     if (cmd == "uci") {
-      std::cout << "id name ChessEngine\n";
-      std::cout << "id author LMStudio\n";
-      std::cout << "option name Depth type spin default 12 min 1 max 20\n";
-      std::cout << "uciok\n";
+      log_line(log, "id name ChessEngine");
+      log_line(log, "id author LMStudio");
+      log_line(log, "option name Depth type spin default 12 min 1 max 20");
+      log_line(log, "uciok");
     } else if (cmd == "isready") {
-      std::cout << "readyok\n";
+      log_line(log, "readyok");
     } else if (cmd == "ucinewgame") {
       engine.uci_new_game();
     } else if (cmd == "position") {
@@ -52,9 +62,9 @@ int main() {
         if (t == "depth") iss >> depth;
         else if (t == "infinite") infinite = true;
       }
-      engine.go(depth, infinite);
+      engine.go(depth, infinite, [&](const std::string& s){ log_line(log, s); });
       if (!infinite) {
-        std::cout << "bestmove " << engine.best_move() << "\n";
+        log_line(log, "bestmove " + engine.best_move());
       }
 
     } else if (cmd == "stop") {
