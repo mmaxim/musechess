@@ -28,14 +28,14 @@ std::uint8_t corner_rights(int sq) {
 }  // namespace
 
 U64 Board::occupancy() const {
-  U64 occ = 0;
-  for (int i = 0; i < kNumPieces; ++i) occ |= masks[i];
+  auto occ = U64{0};
+  for (auto i = 0; i < kNumPieces; ++i) occ |= masks[i];
   return occ;
 }
 
 U64 Board::color_mask(Color c) const {
-  U64 m = 0;
-  for (int i = 0; i < kNumPieces; ++i) {
+  auto m = U64{0};
+  for (auto i = 0; i < kNumPieces; ++i) {
     if (color_of_piece(static_cast<Piece>(i)) == c) m |= masks[i];
   }
   return m;
@@ -46,7 +46,7 @@ U64 Board::type_mask(PieceType t) const {
 }
 
 Piece Board::piece_at(int sq) const {
-  for (int i = 0; i < kNumPieces; ++i) {
+  for (auto i = 0; i < kNumPieces; ++i) {
     if (bitboard::test_bit(masks[i], sq)) return static_cast<Piece>(i);
   }
   return kNumPieces;
@@ -55,8 +55,8 @@ Piece Board::piece_at(int sq) const {
 bool Board::set_fen(const std::string& fen) {
   std::vector<std::string> fields;
   {
-    std::string current;
-    for (char c : fen) {
+    auto current = std::string{};
+    for (auto c : fen) {
       if (c == ' ') {
         if (!current.empty()) { fields.push_back(current); current.clear(); }
       } else {
@@ -72,10 +72,10 @@ bool Board::set_fen(const std::string& fen) {
 
   // 1) Piece placement.
   {
-    const std::string& placement = fields[0];
-    int rank = 7;
-    int file = 0;
-    for (char c : placement) {
+    auto &placement = fields[0];
+    auto rank = 7;
+    auto file = 0;
+    for (auto c : placement) {
       if (c == '/') {
         if (rank == 0) return false;  // Trailing '/' or too many ranks.
         --rank;
@@ -88,7 +88,7 @@ bool Board::set_fen(const std::string& fen) {
         if (file > 8) return false;
         continue;
       }
-      char pc = to_lower(c);
+      auto pc = to_lower(c);
       PieceType t;
       switch (pc) {
         case 'p': t = PieceType::Pawn;   break;
@@ -117,9 +117,9 @@ bool Board::set_fen(const std::string& fen) {
 
   // 3) Castling rights.
   if (fields.size() >= 3) {
-    const std::string& c = fields[2];
+    auto &c = fields[2];
     if (c != "-") {
-      for (char ch : c) {
+      for (auto ch : c) {
         switch (ch) {
           case 'K': b.castling |= Board::kWhiteKingside; break;
           case 'Q': b.castling |= Board::kWhiteQueenside; break;
@@ -133,24 +133,24 @@ bool Board::set_fen(const std::string& fen) {
 
   // 4) En-passant square.
   if (fields.size() >= 4 && fields[3] != "-") {
-    const std::string& ep = fields[3];
+    auto &ep = fields[3];
     if (ep.size() != 2) return false;
-    const int file = ep[0] - 'a';
-    const int rank = ep[1] - '1';
+    auto file = ep[0] - 'a';
+    auto rank = ep[1] - '1';
     if (file < 0 || file > 7 || rank != 2 && rank != 5) return false;
     b.ep_square = bitboard::square(rank, file);
   }
 
   // 5) Halfmove clock.
   if (fields.size() >= 5) {
-    int v = std::strtol(fields[4].c_str(), nullptr, 10);
+    auto v = std::strtol(fields[4].c_str(), nullptr, 10);
     if (v < 0) return false;
     b.halfmove_clock = v;
   }
 
   // 6) Fullmove number.
   if (fields.size() >= 6) {
-    int v = std::strtol(fields[5].c_str(), nullptr, 10);
+    auto v = std::strtol(fields[5].c_str(), nullptr, 10);
     if (v < 1) return false;
     b.fullmove = v;
   }
@@ -160,11 +160,11 @@ bool Board::set_fen(const std::string& fen) {
 }
 
 std::string Board::to_fen() const {
-  std::string s;
-  for (int rank = 7; rank >= 0; --rank) {
-    int run = 0;
-    for (int file = 0; file < 8; ++file) {
-      const int sq = bitboard::square(rank, file);
+  auto s = std::string{};
+  for (auto rank = 7; rank >= 0; --rank) {
+    auto run = 0;
+    for (auto file = 0; file < 8; ++file) {
+      auto sq = bitboard::square(rank, file);
       Piece p = piece_at(sq);
       if (p == kNumPieces) {
         ++run;
@@ -174,8 +174,8 @@ std::string Board::to_fen() const {
         s += static_cast<char>('0' + run);
         run = 0;
       }
-      const bool white = color_of_piece(p) == Color::White;
-      const char base = piece_char(type_of_piece(p));
+      auto white = color_of_piece(p) == Color::White;
+      auto base = piece_char(type_of_piece(p));
       s += white ? base : static_cast<char>(to_lower(base));
     }
     if (run) s += static_cast<char>('0' + run);
@@ -204,11 +204,11 @@ std::string Board::to_fen() const {
 }
 
 void Board::make_move(const Move& m) {
-  const Color me = side_to_move;
-  const Color opp = opponent(me);
-  const Piece mover = piece_at(m.from);
-  const PieceType mover_type = type_of_piece(mover);
-  const bool is_capture = bitboard::test_bit(color_mask(opp), m.to) || m.has_flag(Move::kEnPassant);
+  auto me = side_to_move;
+  auto opp = opponent(me);
+  auto mover = piece_at(m.from);
+  auto mover_type = type_of_piece(mover);
+  auto is_capture = bitboard::test_bit(color_mask(opp), m.to) || m.has_flag(Move::kEnPassant);
 
   // Remove the moving piece from its origin.
   masks[mover] &= ~bitboard::set_bit(m.from);
@@ -216,17 +216,17 @@ void Board::make_move(const Move& m) {
   // Remove any opponent piece captured on the destination square. (En-passant
   // captures a pawn on the *side* of the destination, which is handled below.)
   if (!m.has_flag(Move::kEnPassant)) {
-    const U64 to_bit = bitboard::set_bit(m.to);
-    const U64 captured = color_mask(opp) & to_bit;
+    auto to_bit = bitboard::set_bit(m.to);
+    auto captured = color_mask(opp) & to_bit;
     if (captured) {
-      const Piece cap = piece_at(m.to);
+      auto cap = piece_at(m.to);
       masks[cap] &= ~to_bit;
     }
   }
 
   // Place it on the destination (as a promoted piece if applicable).
   {
-    const Piece dest_piece = (m.promotion != PieceType::None)
+    auto dest_piece = (m.promotion != PieceType::None)
                                  ? piece_index(me, m.promotion)
                                  : mover;
     masks[dest_piece] |= bitboard::set_bit(m.to);
@@ -234,8 +234,8 @@ void Board::make_move(const Move& m) {
 
   // En-passant removes the captured pawn next to the destination.
   if (m.has_flag(Move::kEnPassant)) {
-    const int captured_sq = (me == Color::White) ? m.to - 8 : m.to + 8;
-    const Piece cap = (me == Color::White) ? kBlackPawn : kWhitePawn;
+    auto captured_sq = (me == Color::White) ? m.to - 8 : m.to + 8;
+    auto cap = (me == Color::White) ? kBlackPawn : kWhitePawn;
     masks[cap] &= ~bitboard::set_bit(captured_sq);
   }
 

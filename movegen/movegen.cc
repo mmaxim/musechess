@@ -31,9 +31,9 @@ constexpr std::array<Dir, 8> kQueenDirs = {{
 
 // All squares a set of knights can reach (within the board).
 U64 knight_attack_mask(U64 knights) {
-  U64 out = 0;
+  auto out = U64{0};
   while (knights) {
-    const int sq = ctz(knights);
+    auto sq = ctz(knights);
     knights &= knights - 1;
     for (const Dir& d : kKnightDirs) {
       const int r = rank_of(sq) + d.dr;
@@ -47,9 +47,9 @@ U64 knight_attack_mask(U64 knights) {
 
 // All squares a set of kings can reach (within the board).
 U64 king_attack_mask(U64 kings) {
-  U64 out = 0;
+  auto out = U64{0};
   while (kings) {
-    const int sq = ctz(kings);
+    auto sq = ctz(kings);
     kings &= kings - 1;
     for (const Dir& d : kKingDirs) {
       const int r = rank_of(sq) + d.dr;
@@ -64,14 +64,14 @@ U64 king_attack_mask(U64 kings) {
 // Sliding attack rays: every square along each direction up to and including
 // the first occupied square.
 U64 ray_attack_mask(U64 sliders, U64 occ, const std::array<Dir, 4>& dirs) {
-  U64 out = 0;
+  auto out = U64{0};
   while (sliders) {
-    const int sq = ctz(sliders);
+    auto sq = ctz(sliders);
     sliders &= sliders - 1;
     for (const Dir& d : dirs) {
-      U64 cur = set_bit(sq);
+      auto cur = set_bit(sq);
       while (true) {
-        U64 nxt = shift_dir(cur, d.dr, d.df);
+        auto nxt = shift_dir(cur, d.dr, d.df);
         if (!nxt) break;
         out |= nxt;
         if (nxt & occ) break;
@@ -93,9 +93,9 @@ constexpr std::array<PieceType, 4> kPromotions = {
 }  // namespace
 
 U64 attacked_by(const Board& b, Color c) {
-  const U64 occ = b.occupancy();
-  const U64 pawns = b.masks[piece_index(c, PieceType::Pawn)];
-  U64 out;
+  auto occ = b.occupancy();
+  auto pawns = b.masks[piece_index(c, PieceType::Pawn)];
+  auto out = U64{};
   if (c == Color::White) {
     out = shift_dir(pawns, 1, 1) | shift_dir(pawns, 1, -1);
   } else {
@@ -117,13 +117,13 @@ bool in_check(const Board& b) {
 namespace {
 
 void gen_pawn_moves(const Board& b, MoveList& out) {
-  const Color me = b.side_to_move;
-  const Color opp = opponent(me);
-  const U64 occ = b.occupancy();
-  const U64 pawns = b.masks[piece_index(me, PieceType::Pawn)];
-  const U64 enemies = b.color_mask(opp);
-  const bool white = (me == Color::White);
-  const int promo_rank = white ? 7 : 0;
+  auto me = b.side_to_move;
+  auto opp = opponent(me);
+  auto occ = b.occupancy();
+  auto pawns = b.masks[piece_index(me, PieceType::Pawn)];
+  auto enemies = b.color_mask(opp);
+  auto white = (me == Color::White);
+  auto promo_rank = white ? 7 : 0;
 
   auto add_promotions = [&](Move m) {
     for (PieceType pt : kPromotions) {
