@@ -47,15 +47,10 @@ int Search<Evaluator>::negamax_internal(Board& b, int depth, int alpha, int beta
   for (auto& m : moves) {
     Board child = b;
     child.make_move(m);
-    Move child_pv[kMaxDepth];
-    int score = -negamax_internal(child, depth - 1, -beta, -alpha, child_pv, ply + 1);
+    int score = -negamax_internal(child, depth - 1, -beta, -alpha, pv, ply + 1);
     if (score > best) {
       best = score;
       best_move = m;
-      // copy child PV into current PV
-      for (int i = 0; i < kMaxDepth - ply - 1; ++i) {
-        pv[ply + 1 + i] = child_pv[i];
-      }
     }
     if (score > alpha) alpha = score;
     if (alpha >= beta) break;
