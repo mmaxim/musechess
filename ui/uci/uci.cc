@@ -69,7 +69,7 @@ void Engine::go(int depth, bool infinite, std::function<void(const std::string&)
   if (infinite) {
     int d = 1;
     while (!impl_->stopped) {
-      auto res = impl_->deepener.search(impl_->board, d, output_info);
+      auto res = impl_->deepener.search_depth(impl_->board, d, output_info);
       impl_->last_best_move = res.best_move.to_string();
       ++d;
     }
