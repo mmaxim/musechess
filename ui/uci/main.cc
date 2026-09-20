@@ -14,7 +14,7 @@ auto log_line = [](std::ofstream& log, const std::string& s){
 };
 
 int main() {
-  std::ofstream log("D:/AI/Projects/Chess/build/uci.log", std::ios::app);
+  std::ofstream log("C:/temp/uci.log", std::ios::app);
   Engine engine;
   std::string line;
   while (std::getline(std::cin, line)) {
