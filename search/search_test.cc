@@ -93,3 +93,24 @@ TEST(Search, IterativeDeepenerPVLength) {
     EXPECT_EQ(res.pv.moves.size(), static_cast<size_t>(d)) << "Iterative deepener PV length mismatch at depth " << d;
   }
 }
+
+TEST(Search, PVIsLegalAndProgresses) {
+  auto b = board_from("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+  auto res = searcher.search(b, 4);
+  ASSERT_EQ(res.pv.moves.size(), 4u);
+  Board tmp = b;
+  for (size_t i = 0; i < res.pv.moves.size(); ++i) {
+    auto& m = res.pv.moves[i];
+    auto moves = generate_moves(tmp);
+    bool found = false;
+    for (auto& mm : moves) {
+      if (mm.from == m.from && mm.to == m.to) { found = true; break; }
+    }
+    EXPECT_TRUE(found) << "PV move " << i << " not legal";
+    tmp.make_move(m);
+  }
+  // Ensure no immediate repetition of same from/to at different ply
+  for (size_t i = 1; i < res.pv.moves.size(); ++i) {
+    EXPECT_NE(res.pv.moves[i].from, res.pv.moves[i-2].from) << "PV repeats move at ply " << i;
+  }
+}
