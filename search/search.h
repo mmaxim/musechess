@@ -6,6 +6,7 @@
 
 #include <functional>
 #include <limits>
+#include <vector>
 
 namespace chess {
 
@@ -13,6 +14,7 @@ struct SearchResult {
   int score = 0;
   Move best_move{};
   int nodes = 0;
+  std::vector<Move> pv;
 };
 
 template <typename Evaluator>
@@ -26,7 +28,7 @@ class Search {
   Evaluator evaluator_;
   int nodes_ = 0;
 
-  int negamax_internal(Board& b, int depth, int alpha, int beta, bool can_null);
+  int negamax_internal(Board& b, int depth, int alpha, int beta);
 };
 
 }  // namespace chess
