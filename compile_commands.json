@@ -1,0 +1,74 @@
+[
+{
+  "directory": "D:/AI/Projects/Chess/build",
+  "command": "C:\\PROGRA~2\\MICROS~2\\18\\BUILDT~1\\VC\\Tools\\MSVC\\1451~1.362\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -ID:\\AI\\Projects\\Chess\\movegen -external:ID:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googletest\\include -external:ID:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googletest -external:W0 /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MD /FoCMakeFiles\\tests.dir\\movegen\\board_test.cc.obj /FdCMakeFiles\\tests.dir\\ /FS -c D:\\AI\\Projects\\Chess\\movegen\\board_test.cc",
+  "file": "D:/AI/Projects/Chess/movegen/board_test.cc",
+  "output": "CMakeFiles/tests.dir/movegen/board_test.cc.obj"
+},
+{
+  "directory": "D:/AI/Projects/Chess/build",
+  "command": "C:\\PROGRA~2\\MICROS~2\\18\\BUILDT~1\\VC\\Tools\\MSVC\\1451~1.362\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -ID:\\AI\\Projects\\Chess\\movegen -external:ID:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googletest\\include -external:ID:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googletest -external:W0 /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MD /FoCMakeFiles\\tests.dir\\movegen\\movegen_test.cc.obj /FdCMakeFiles\\tests.dir\\ /FS -c D:\\AI\\Projects\\Chess\\movegen\\movegen_test.cc",
+  "file": "D:/AI/Projects/Chess/movegen/movegen_test.cc",
+  "output": "CMakeFiles/tests.dir/movegen/movegen_test.cc.obj"
+},
+{
+  "directory": "D:/AI/Projects/Chess/build/movegen",
+  "command": "C:\\PROGRA~2\\MICROS~2\\18\\BUILDT~1\\VC\\Tools\\MSVC\\1451~1.362\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -ID:\\AI\\Projects\\Chess\\movegen /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MD /FoCMakeFiles\\chess_movegen.dir\\board.cc.obj /FdCMakeFiles\\chess_movegen.dir\\chess_movegen.pdb /FS -c D:\\AI\\Projects\\Chess\\movegen\\board.cc",
+  "file": "D:/AI/Projects/Chess/movegen/board.cc",
+  "output": "movegen/CMakeFiles/chess_movegen.dir/board.cc.obj"
+},
+{
+  "directory": "D:/AI/Projects/Chess/build/movegen",
+  "command": "C:\\PROGRA~2\\MICROS~2\\18\\BUILDT~1\\VC\\Tools\\MSVC\\1451~1.362\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -ID:\\AI\\Projects\\Chess\\movegen /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MD /FoCMakeFiles\\chess_movegen.dir\\movegen.cc.obj /FdCMakeFiles\\chess_movegen.dir\\chess_movegen.pdb /FS -c D:\\AI\\Projects\\Chess\\movegen\\movegen.cc",
+  "file": "D:/AI/Projects/Chess/movegen/movegen.cc",
+  "output": "movegen/CMakeFiles/chess_movegen.dir/movegen.cc.obj"
+},
+{
+  "directory": "D:/AI/Projects/Chess/build/movegen",
+  "command": "C:\\PROGRA~2\\MICROS~2\\18\\BUILDT~1\\VC\\Tools\\MSVC\\1451~1.362\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -ID:\\AI\\Projects\\Chess\\movegen /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MD /FoCMakeFiles\\chess-demo.dir\\main.cc.obj /FdCMakeFiles\\chess-demo.dir\\ /FS -c D:\\AI\\Projects\\Chess\\movegen\\main.cc",
+  "file": "D:/AI/Projects/Chess/movegen/main.cc",
+  "output": "movegen/CMakeFiles/chess-demo.dir/main.cc.obj"
+},
+{
+  "directory": "D:/AI/Projects/Chess/build/_deps/googletest-build/googlemock",
+  "command": "C:\\PROGRA~2\\MICROS~2\\18\\BUILDT~1\\VC\\Tools\\MSVC\\1451~1.362\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -ID:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googlemock\\include -ID:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googlemock -ID:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googletest\\include -ID:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googletest /DWIN32 /D_WINDOWS  /O2 /Ob2 /DNDEBUG -std:c++20 -MD -GS -W4 -WX -wd4251 -wd4275 -nologo -J -D_UNICODE -DUNICODE -DWIN32 -D_WIN32 -DSTRICT -DWIN32_LEAN_AND_MEAN -wd4702 -utf-8 -DGTEST_HAS_PTHREAD=0 -EHsc -D_HAS_EXCEPTIONS=1  /FoCMakeFiles\\gmock.dir\\__\\googletest\\src\\gtest-all.cc.obj /Fd..\\..\\..\\lib\\gmock.pdb /FS -c D:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googletest\\src\\gtest-all.cc",
+  "file": "D:/AI/Projects/Chess/build/_deps/googletest-src/googletest/src/gtest-all.cc",
+  "output": "_deps/googletest-build/googlemock/CMakeFiles/gmock.dir/__/googletest/src/gtest-all.cc.obj"
+},
+{
+  "directory": "D:/AI/Projects/Chess/build/_deps/googletest-build/googlemock",
+  "command": "C:\\PROGRA~2\\MICROS~2\\18\\BUILDT~1\\VC\\Tools\\MSVC\\1451~1.362\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -ID:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googlemock\\include -ID:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googlemock -ID:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googletest\\include -ID:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googletest /DWIN32 /D_WINDOWS  /O2 /Ob2 /DNDEBUG -std:c++20 -MD -GS -W4 -WX -wd4251 -wd4275 -nologo -J -D_UNICODE -DUNICODE -DWIN32 -D_WIN32 -DSTRICT -DWIN32_LEAN_AND_MEAN -wd4702 -utf-8 -DGTEST_HAS_PTHREAD=0 -EHsc -D_HAS_EXCEPTIONS=1  /FoCMakeFiles\\gmock.dir\\src\\gmock-all.cc.obj /Fd..\\..\\..\\lib\\gmock.pdb /FS -c D:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googlemock\\src\\gmock-all.cc",
+  "file": "D:/AI/Projects/Chess/build/_deps/googletest-src/googlemock/src/gmock-all.cc",
+  "output": "_deps/googletest-build/googlemock/CMakeFiles/gmock.dir/src/gmock-all.cc.obj"
+},
+{
+  "directory": "D:/AI/Projects/Chess/build/_deps/googletest-build/googlemock",
+  "command": "C:\\PROGRA~2\\MICROS~2\\18\\BUILDT~1\\VC\\Tools\\MSVC\\1451~1.362\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -ID:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googlemock\\include -ID:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googlemock -ID:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googletest\\include -ID:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googletest /DWIN32 /D_WINDOWS  /O2 /Ob2 /DNDEBUG -std:c++20 -MD -GS -W4 -WX -wd4251 -wd4275 -nologo -J -D_UNICODE -DUNICODE -DWIN32 -D_WIN32 -DSTRICT -DWIN32_LEAN_AND_MEAN -wd4702 -utf-8 -DGTEST_HAS_PTHREAD=0 -EHsc -D_HAS_EXCEPTIONS=1  /FoCMakeFiles\\gmock_main.dir\\__\\googletest\\src\\gtest-all.cc.obj /Fd..\\..\\..\\lib\\gmock_main.pdb /FS -c D:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googletest\\src\\gtest-all.cc",
+  "file": "D:/AI/Projects/Chess/build/_deps/googletest-src/googletest/src/gtest-all.cc",
+  "output": "_deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/__/googletest/src/gtest-all.cc.obj"
+},
+{
+  "directory": "D:/AI/Projects/Chess/build/_deps/googletest-build/googlemock",
+  "command": "C:\\PROGRA~2\\MICROS~2\\18\\BUILDT~1\\VC\\Tools\\MSVC\\1451~1.362\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -ID:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googlemock\\include -ID:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googlemock -ID:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googletest\\include -ID:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googletest /DWIN32 /D_WINDOWS  /O2 /Ob2 /DNDEBUG -std:c++20 -MD -GS -W4 -WX -wd4251 -wd4275 -nologo -J -D_UNICODE -DUNICODE -DWIN32 -D_WIN32 -DSTRICT -DWIN32_LEAN_AND_MEAN -wd4702 -utf-8 -DGTEST_HAS_PTHREAD=0 -EHsc -D_HAS_EXCEPTIONS=1  /FoCMakeFiles\\gmock_main.dir\\src\\gmock-all.cc.obj /Fd..\\..\\..\\lib\\gmock_main.pdb /FS -c D:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googlemock\\src\\gmock-all.cc",
+  "file": "D:/AI/Projects/Chess/build/_deps/googletest-src/googlemock/src/gmock-all.cc",
+  "output": "_deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/src/gmock-all.cc.obj"
+},
+{
+  "directory": "D:/AI/Projects/Chess/build/_deps/googletest-build/googlemock",
+  "command": "C:\\PROGRA~2\\MICROS~2\\18\\BUILDT~1\\VC\\Tools\\MSVC\\1451~1.362\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -ID:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googlemock\\include -ID:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googlemock -ID:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googletest\\include -ID:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googletest /DWIN32 /D_WINDOWS  /O2 /Ob2 /DNDEBUG -std:c++20 -MD -GS -W4 -WX -wd4251 -wd4275 -nologo -J -D_UNICODE -DUNICODE -DWIN32 -D_WIN32 -DSTRICT -DWIN32_LEAN_AND_MEAN -wd4702 -utf-8 -DGTEST_HAS_PTHREAD=0 -EHsc -D_HAS_EXCEPTIONS=1  /FoCMakeFiles\\gmock_main.dir\\src\\gmock_main.cc.obj /Fd..\\..\\..\\lib\\gmock_main.pdb /FS -c D:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googlemock\\src\\gmock_main.cc",
+  "file": "D:/AI/Projects/Chess/build/_deps/googletest-src/googlemock/src/gmock_main.cc",
+  "output": "_deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/src/gmock_main.cc.obj"
+},
+{
+  "directory": "D:/AI/Projects/Chess/build/_deps/googletest-build/googletest",
+  "command": "C:\\PROGRA~2\\MICROS~2\\18\\BUILDT~1\\VC\\Tools\\MSVC\\1451~1.362\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -ID:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googletest\\include -ID:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googletest /DWIN32 /D_WINDOWS  /O2 /Ob2 /DNDEBUG -std:c++20 -MD -GS -W4 -WX -wd4251 -wd4275 -nologo -J -D_UNICODE -DUNICODE -DWIN32 -D_WIN32 -DSTRICT -DWIN32_LEAN_AND_MEAN -wd4702 -utf-8 -DGTEST_HAS_PTHREAD=0 -EHsc -D_HAS_EXCEPTIONS=1  /FoCMakeFiles\\gtest.dir\\src\\gtest-all.cc.obj /Fd..\\..\\..\\lib\\gtest.pdb /FS -c D:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googletest\\src\\gtest-all.cc",
+  "file": "D:/AI/Projects/Chess/build/_deps/googletest-src/googletest/src/gtest-all.cc",
+  "output": "_deps/googletest-build/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.obj"
+},
+{
+  "directory": "D:/AI/Projects/Chess/build/_deps/googletest-build/googletest",
+  "command": "C:\\PROGRA~2\\MICROS~2\\18\\BUILDT~1\\VC\\Tools\\MSVC\\1451~1.362\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -external:ID:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googletest\\include -external:ID:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googletest -external:W0 /DWIN32 /D_WINDOWS  /O2 /Ob2 /DNDEBUG -std:c++20 -MD -GS -W4 -WX -wd4251 -wd4275 -nologo -J -D_UNICODE -DUNICODE -DWIN32 -D_WIN32 -DSTRICT -DWIN32_LEAN_AND_MEAN -wd4702 -utf-8 -DGTEST_HAS_PTHREAD=0 -EHsc -D_HAS_EXCEPTIONS=1  /FoCMakeFiles\\gtest_main.dir\\src\\gtest_main.cc.obj /Fd..\\..\\..\\lib\\gtest_main.pdb /FS -c D:\\AI\\Projects\\Chess\\build\\_deps\\googletest-src\\googletest\\src\\gtest_main.cc",
+  "file": "D:/AI/Projects/Chess/build/_deps/googletest-src/googletest/src/gtest_main.cc",
+  "output": "_deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.obj"
+}
+]
