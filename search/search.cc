@@ -11,22 +11,24 @@ Search<Evaluator>::Search(Evaluator eval) : evaluator_(std::move(eval)) {}
 template <typename Evaluator>
 SearchResult Search<Evaluator>::search(Board& b, int depth) {
   nodes_ = 0;
-  auto best_score = std::numeric_limits<int>::min();
-  Move best_move{};
-  for (auto& m : generate_moves(b)) {
-    Board child = b;
-    child.make_move(m);
-    auto score = -negamax_internal(child, depth - 1, std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
-    if (score > best_score) {
-      best_score = score;
-      best_move = m;
+  Move pv[kMaxDepth];
+  int alpha = std::numeric_limits<int>::min();
+  int beta = std::numeric_limits<int>::max();
+  int score = negamax_internal(b, depth, alpha, beta, pv, 0);
+  SearchResult res;
+  res.score = score;
+  res.nodes = nodes_;
+  if (pv[0].from != -1) {
+    res.best_move = pv[0];
+    for (int i = 0; i < depth && pv[i].from != -1; ++i) {
+      res.pv.add(pv[i]);
     }
   }
-  return {best_score, best_move, nodes_};
+  return res;
 }
 
 template <typename Evaluator>
-int Search<Evaluator>::negamax_internal(Board& b, int depth, int alpha, int beta) {
+int Search<Evaluator>::negamax_internal(Board& b, int depth, int alpha, int beta, Move* pv, int ply) {
   ++nodes_;
   if (depth == 0) {
     return evaluator_.evaluate(b);
@@ -40,15 +42,25 @@ int Search<Evaluator>::negamax_internal(Board& b, int depth, int alpha, int beta
     return 0;
   }
 
-  auto best = std::numeric_limits<int>::min();
+  int best = std::numeric_limits<int>::min();
+  Move best_move{};
   for (auto& m : moves) {
     Board child = b;
     child.make_move(m);
-    auto score = -negamax_internal(child, depth - 1, -beta, -alpha);
-    if (score > best) best = score;
+    Move child_pv[kMaxDepth];
+    int score = -negamax_internal(child, depth - 1, -beta, -alpha, child_pv, ply + 1);
+    if (score > best) {
+      best = score;
+      best_move = m;
+      // copy child PV into current PV
+      for (int i = 0; i < kMaxDepth - ply - 1; ++i) {
+        pv[ply + 1 + i] = child_pv[i];
+      }
+    }
     if (score > alpha) alpha = score;
     if (alpha >= beta) break;
   }
+  pv[ply] = best_move;
   return best;
 }
 

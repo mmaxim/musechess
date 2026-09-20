@@ -56,9 +56,10 @@ void Engine::position(const std::string& fen, const std::vector<std::string>& mo
 void Engine::go(int depth, bool infinite, std::function<void(const std::string&)> info_cb) {
   impl_->stopped = false;
   int maxDepth = depth > 0 ? depth : impl_->opts.depth;
-  auto output_info = [&](int d, int score, int nodes, Move best){
+  auto send_info = [&](int d, const SearchResult& res){
     if (!impl_->stopped) {
-      std::string s = "info depth " + std::to_string(d) + " score cp " + std::to_string(score) + " nodes " + std::to_string(nodes) + " pv " + best.to_string();
+      std::string pv_str = res.pv.to_string();
+      std::string s = "info depth " + std::to_string(d) + " score cp " + std::to_string(res.score) + " nodes " + std::to_string(res.nodes) + " pv " + pv_str;
       if (info_cb) info_cb(s);
       else {
         std::cout << s << "\n";
@@ -69,14 +70,18 @@ void Engine::go(int depth, bool infinite, std::function<void(const std::string&)
   if (infinite) {
     int d = 1;
     while (!impl_->stopped) {
-      auto res = impl_->deepener.search_depth(impl_->board, d, output_info);
+      auto res = impl_->deepener.search_depth(impl_->board, d);
       impl_->last_best_move = res.best_move.to_string();
+      send_info(d, res);
       ++d;
     }
     return;
   }
-  auto res = impl_->deepener.search(impl_->board, maxDepth, output_info);
-  impl_->last_best_move = res.best_move.to_string();
+  for (int d = 1; d <= maxDepth; ++d) {
+    auto res = impl_->deepener.search_depth(impl_->board, d);
+    impl_->last_best_move = res.best_move.to_string();
+    send_info(d, res);
+  }
 }
 
 void Engine::stop() {
