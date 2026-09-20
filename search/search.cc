@@ -57,7 +57,6 @@ int Search<Evaluator>::negamax_internal(Board& b, int depth, int alpha, int beta
 }
 
 // Explicit instantiation for the evaluators we know about
-// Add more here as new evaluators are introduced
 template class Search<class MaterialEvaluator>;
 
 }  // namespace chess

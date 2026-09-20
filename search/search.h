@@ -4,6 +4,7 @@
 #include "movegen/move.h"
 #include "movegen/movegen.h"
 
+#include <functional>
 #include <limits>
 
 namespace chess {
