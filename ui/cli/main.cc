@@ -1,8 +1,11 @@
 #include "game/game.h"
 #include "movegen/board.h"
 #include "movegen/movegen.h"
+#include "search/search.h"
+#include "eval/eval.h"
 
 #include <iostream>
+#include <string>
 #include <memory>
 
 using namespace chess;
@@ -15,8 +18,7 @@ void print_board(const Board& b) {
       auto p = b.piece_at(sq);
       char c = '.';
       if (p != static_cast<Piece>(kNumPieces)) {
-        // Very simple symbol
-        c = 'p';
+        c = (color_of_piece(p) == Color::White ? 'w' : 'b');
       }
       std::cout << c << ' ';
     }
@@ -25,32 +27,51 @@ void print_board(const Board& b) {
   std::cout << "  a b c d e f g h\n";
 }
 
+int sq_from_str(const std::string& s) {
+  if (s.size() < 2) return -1;
+  int file = s[0] - 'a';
+  int rank = s[1] - '1';
+  if (file <0 || file>7 || rank<0 || rank>7) return -1;
+  return rank*8 + file;
+}
+
 int main() {
   std::cout << "Chess CLI - Human vs Computer\n";
   std::cout << "White is human, Black is computer\n\n";
 
-  auto white = std::make_unique<HumanPlayer>();
-  auto black = std::make_unique<ComputerPlayer>(3);
-  Clock clock;
-  clock.white_time = std::chrono::minutes(5);
-  clock.black_time = std::chrono::minutes(5);
+  Board board;
+  board.set_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
-  Game game(std::move(white), std::move(black), clock);
+  MaterialEvaluator eval;
+  Search<MaterialEvaluator> searcher(eval);
 
-  print_board(game.board());
-  std::cout << "Game started. Enter moves as e2e4. Type 'quit' to exit.\n";
-
-  // Simple loop for demonstration
   while (true) {
-    auto moves = generate_moves(game.board());
-    if (moves.empty()) {
-      std::cout << "Game over.\n";
-      break;
+    print_board(board);
+    std::cout << (board.side_to_move == Color::White ? "White" : "Black") << " to move\n";
+    if (board.side_to_move == Color::White) {
+      std::cout << "Enter move e2e4: ";
+      std::string in;
+      if (!(std::cin >> in)) break;
+      if (in == "quit") break;
+      if (in.size() < 4) { std::cout << "Invalid\n"; continue; }
+      int from = sq_from_str(in.substr(0,2));
+      int to   = sq_from_str(in.substr(2,2));
+      if (from <0 || to <0) { std::cout << "Invalid squares\n"; continue; }
+      MoveList moves = generate_moves(board);
+      bool ok = false;
+      for (int i=0;i<moves.size();++i) if (moves[i].from==from && moves[i].to==to) ok=true;
+      if (!ok) { std::cout << "Illegal move\n"; continue; }
+      Move m; m.from=from; m.to=to;
+      board.make_move(m);
+      std::cout << "You played " << m.to_string() << "\n";
+    } else {
+      std::cout << "Engine thinking...\n";
+      auto res = searcher.search(board, 3);
+      std::cout << "Engine plays " << res.best_move.to_string()
+                << " score " << res.score
+                << " nodes " << res.nodes << "\n";
+      board.make_move(res.best_move);
     }
-    // For now just show possible moves count
-    std::cout << "Legal moves: " << moves.size() << "\n";
-    break; // avoid infinite loop in demo
   }
-
   return 0;
 }

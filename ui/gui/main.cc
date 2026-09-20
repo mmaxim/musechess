@@ -1,9 +1,12 @@
 #include <windows.h>
 #include <string>
+#include <cstdio>
 
 #include "game/game.h"
 #include "movegen/board.h"
 #include "movegen/movegen.h"
+#include "search/search.h"
+#include "eval/eval.h"
 
 using namespace chess;
 
@@ -11,7 +14,7 @@ constexpr int BOARD_SIZE = 8;
 constexpr int SQUARE_PX = 60;
 constexpr int BOARD_PX = BOARD_SIZE * SQUARE_PX;
 constexpr int WINDOW_W = BOARD_PX + 16;
-constexpr int WINDOW_H = BOARD_PX + 38;
+constexpr int WINDOW_H = BOARD_PX + 58;
 
 struct AppState {
   Board board;
@@ -19,6 +22,7 @@ struct AppState {
   int drag_from = -1;
   POINT drag_offset{0,0};
   POINT mouse_pos{0,0};
+  char status[256] = "White to move";
 };
 
 AppState g_state;
@@ -43,10 +47,32 @@ std::wstring piece_to_wstring(Piece p) {
   return black_sym[idx];
 }
 
+void make_computer_move(HWND hwnd) {
+  if (g_state.board.side_to_move != Color::Black) return;
+  MaterialEvaluator eval;
+  Search<MaterialEvaluator> searcher(eval);
+  // Simple thinking output
+  char buf[256];
+  sprintf_s(buf, sizeof(buf), "Engine thinking depth 3...");
+  OutputDebugStringA(buf);
+  sprintf_s(buf, sizeof(buf), "Engine thinking depth 3...");
+  strncpy_s(g_state.status, buf, _TRUNCATE);
+  InvalidateRect(hwnd, nullptr, TRUE);
+  auto result = searcher.search(g_state.board, 3);
+  sprintf_s(buf, sizeof(buf), "Engine move %s score %d nodes %d",
+    result.best_move.to_string().c_str(), result.score, result.nodes);
+  OutputDebugStringA(buf);
+  sprintf_s(buf, sizeof(buf), "Black plays %s", result.best_move.to_string().c_str());
+  strncpy_s(g_state.status, buf, _TRUNCATE);
+  g_state.board.make_move(result.best_move);
+  InvalidateRect(hwnd, nullptr, TRUE);
+}
+
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
   switch (msg) {
     case WM_CREATE: {
       g_state.board.set_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+      strncpy_s(g_state.status, "White to move", _TRUNCATE);
       return 0;
     }
     case WM_PAINT: {
@@ -90,6 +116,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
       }
       SelectObject(hdc, old);
       DeleteObject(hFont);
+      // Status bar
+      SetBkMode(hdc, OPAQUE);
+      SetTextColor(hdc, RGB(0,0,0));
+      TextOutA(hdc, 10, BOARD_PX + 40, g_state.status, (int)strlen(g_state.status));
       EndPaint(hwnd, &ps);
       return 0;
     }
@@ -127,6 +157,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
               m.from = g_state.drag_from;
               m.to = to_sq;
               g_state.board.make_move(m);
+              char buf[256];
+              sprintf_s(buf, sizeof(buf), "White played %s", m.to_string().c_str());
+              OutputDebugStringA(buf);
+              strncpy_s(g_state.status, buf, _TRUNCATE);
+              InvalidateRect(hwnd, nullptr, TRUE);
+              // Computer reply
+              make_computer_move(hwnd);
               break;
             }
           }
