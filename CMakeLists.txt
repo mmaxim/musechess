@@ -12,6 +12,8 @@ endif()
 add_subdirectory(movegen)
 add_subdirectory(eval)
 add_subdirectory(search)
+add_subdirectory(game)
+add_subdirectory(ui)
 
 # --- Tests (GoogleTest, fetched at configure time) ---
 include(FetchContent)
@@ -25,8 +27,9 @@ FetchContent_MakeAvailable(googletest)
 add_executable(tests
   movegen/board_test.cc
   movegen/movegen_test.cc
-  search/search_test.cc)
-target_link_libraries(tests PRIVATE chess_movegen chess_eval chess_search GTest::gtest GTest::gtest_main)
+  search/search_test.cc
+  game/game_test.cc)
+target_link_libraries(tests PRIVATE chess_movegen chess_eval chess_search chess_game GTest::gtest GTest::gtest_main)
 
 enable_testing()
 add_test(NAME tests COMMAND tests)
