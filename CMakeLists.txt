@@ -10,6 +10,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 add_subdirectory(movegen)
+add_subdirectory(search)
 
 # --- Tests (GoogleTest, fetched at configure time) ---
 include(FetchContent)
@@ -22,8 +23,9 @@ FetchContent_MakeAvailable(googletest)
 
 add_executable(tests
   movegen/board_test.cc
-  movegen/movegen_test.cc)
-target_link_libraries(tests PRIVATE chess_movegen GTest::gtest GTest::gtest_main)
+  movegen/movegen_test.cc
+  search/search_test.cc)
+target_link_libraries(tests PRIVATE chess_movegen chess_search GTest::gtest GTest::gtest_main)
 
 enable_testing()
 add_test(NAME tests COMMAND tests)
