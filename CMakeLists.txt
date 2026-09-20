@@ -15,6 +15,17 @@ add_subdirectory(search)
 add_subdirectory(game)
 add_subdirectory(ui)
 
+# --- Executables moved to top level to land in build root ---
+add_executable(chess-demo movegen/main.cc)
+target_link_libraries(chess-demo PRIVATE chess_movegen)
+
+add_executable(chess_cli ui/cli/main.cc)
+target_include_directories(chess_cli PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_SOURCE_DIR})
+target_link_libraries(chess_cli PRIVATE chess_game chess_movegen)
+
+add_executable(uci ui/uci/main.cc)
+target_link_libraries(uci PRIVATE chess_uci)
+
 # --- Tests (GoogleTest, fetched at configure time) ---
 include(FetchContent)
 FetchContent_Declare(
