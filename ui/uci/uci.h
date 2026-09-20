@@ -19,7 +19,7 @@ class Engine {
   void set_option(const std::string& key, const std::string& value);
   void uci_new_game();
   void position(const std::string& fen, const std::vector<std::string>& moves);
-  void go(int depth = -1);
+  void go(int depth = -1, bool infinite = false);
   void stop();
   std::string best_move() const;
   std::string info() const;

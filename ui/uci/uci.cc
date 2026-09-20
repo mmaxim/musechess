@@ -53,9 +53,22 @@ void Engine::position(const std::string& fen, const std::vector<std::string>& mo
   impl_->board = b;
 }
 
-void Engine::go(int depth) {
+void Engine::go(int depth, bool infinite) {
   impl_->stopped = false;
   int maxDepth = depth > 0 ? depth : impl_->opts.depth;
+  if (infinite) {
+    int d = 1;
+    while (!impl_->stopped) {
+      auto res = impl_->deepener.search(impl_->board, d, [&](int dd, int score, int nodes, Move best){
+        if (!impl_->stopped) {
+          std::cout << "info depth " << dd << " score cp " << score << " nodes " << nodes << " bestmove " << best.to_string() << "\n";
+        }
+      });
+      impl_->last_best_move = res.best_move.to_string();
+      ++d;
+    }
+    return;
+  }
   auto res = impl_->deepener.search(impl_->board, maxDepth, [&](int d, int score, int nodes, Move best){
     if (!impl_->stopped) {
       std::cout << "info depth " << d << " score cp " << score << " nodes " << nodes << " bestmove " << best.to_string() << "\n";

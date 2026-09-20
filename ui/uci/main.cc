@@ -46,12 +46,17 @@ int main() {
       engine.position(fen, moves);
     } else if (cmd == "go") {
       int depth = -1;
+      bool infinite = false;
       std::string t;
       while (iss >> t) {
         if (t == "depth") iss >> depth;
+        else if (t == "infinite") infinite = true;
       }
-      engine.go(depth);
-      std::cout << "bestmove " << engine.best_move() << "\n";
+      engine.go(depth, infinite);
+      if (!infinite) {
+        std::cout << "bestmove " << engine.best_move() << "\n";
+      }
+
     } else if (cmd == "stop") {
       engine.stop();
     } else if (cmd == "quit") {
