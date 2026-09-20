@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "search.h"
+#include "search/iterative_deepener.h"
 #include "eval/eval.h"
 #include "movegen/board.h"
 #include "movegen/movegen.h"
@@ -67,4 +68,28 @@ TEST(Search, SearchRespectsCheck) {
   Board child = b;
   child.make_move(res.best_move);
   EXPECT_FALSE(in_check(child));
+}
+
+TEST(Search, PVLengthMatchesDepth) {
+  auto b = board_from("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+  for (int d = 1; d <= 4; ++d) {
+    auto res = searcher.search(b, d);
+    EXPECT_EQ(res.pv.moves.size(), static_cast<size_t>(d)) << "PV length mismatch at depth " << d;
+  }
+}
+
+TEST(Search, PVFirstMoveEqualsBestMove) {
+  auto b = board_from("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+  auto res = searcher.search(b, 3);
+  ASSERT_FALSE(res.pv.moves.empty());
+  EXPECT_EQ(res.best_move, res.pv.moves[0]);
+}
+
+TEST(Search, IterativeDeepenerPVLength) {
+  auto b = board_from("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+  IterativeDeepener<MaterialEvaluator> deepener{mat_eval};
+  for (int d = 1; d <= 4; ++d) {
+    auto res = deepener.search_depth(b, d);
+    EXPECT_EQ(res.pv.moves.size(), static_cast<size_t>(d)) << "Iterative deepener PV length mismatch at depth " << d;
+  }
 }

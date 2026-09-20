@@ -10,7 +10,7 @@
 
 namespace chess {
 
-struct PV {
+struct Variation {
   std::vector<Move> moves;
   void add(const Move& m) { moves.push_back(m); }
   void clear() { moves.clear(); }
@@ -28,7 +28,7 @@ struct SearchResult {
   int score = 0;
   Move best_move{};
   int nodes = 0;
-  PV pv;
+  Variation pv;
 };
 
 template <typename Evaluator>
