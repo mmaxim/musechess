@@ -68,9 +68,7 @@ int Search<Evaluator>::negamax_internal(Board& b, int depth, int alpha, int beta
     if (score > alpha) alpha = score;
     if (alpha >= beta) break;
   }
-  if (ply < static_cast<int>(pv.moves.size())) {
-    pv.moves[ply] = best_move;
-  }
+  pv.set(ply, best_move);
   return best;
 }
 

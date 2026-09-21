@@ -15,6 +15,10 @@ struct Variation {
   std::vector<Move> moves;
   void add(const Move& m) { moves.push_back(m); }
   void clear() { moves.clear(); }
+  void set(int ply, const Move& m) {
+    if (moves.size() <= static_cast<size_t>(ply)) moves.resize(ply + 1);
+    moves[ply] = m;
+  }
   std::string to_string() const {
     std::string s;
     for (size_t i = 0; i < moves.size(); ++i) {
