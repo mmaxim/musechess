@@ -11,17 +11,17 @@ class IterativeDeepener {
 
   void set_stop_flag(std::atomic<bool>* flag) { search_.set_stop_flag(flag); }
 
-  SearchResult search(Board& b, int maxDepth) {
+  SearchResult search(Board& b, int maxDepth, std::function<void(const SearchResult&)> cb = nullptr) {
     SearchResult best{0, Move{}, 0};
     for (int d = 1; d <= maxDepth; ++d) {
-      auto res = search_.search(b, d);
+      auto res = search_.search(b, d, cb);
       best = res;
     }
     return best;
   }
 
-  SearchResult search_depth(Board& b, int depth) {
-    return search_.search(b, depth);
+  SearchResult search_depth(Board& b, int depth, std::function<void(const SearchResult&)> cb = nullptr) {
+    return search_.search(b, depth, cb);
   }
 
  private:

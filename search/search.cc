@@ -12,7 +12,8 @@ template <typename Evaluator>
 Search<Evaluator>::Search(Evaluator eval) : evaluator_(std::move(eval)) {}
 
 template <typename Evaluator>
-SearchResult Search<Evaluator>::search(Board& b, int depth) {
+SearchResult Search<Evaluator>::search(Board& b, int depth, std::function<void(const SearchResult&)> cb) {
+  callback_ = std::move(cb);
   nodes_ = 0;
   Variation pv;
   pv.moves.resize(kMaxDepth);
@@ -112,6 +113,19 @@ int Search<Evaluator>::negamax_internal(Board& b, int depth, int alpha, int beta
         if (ply + 1 + i < static_cast<int>(pv.moves.size())) {
           pv.moves[ply + 1 + i] = child_pv.moves[ply + 1 + i];
         }
+      }
+      if (ply == 0 && callback_) {
+        SearchResult tmp;
+        tmp.score = best;
+        tmp.best_move = best_move;
+        tmp.nodes = nodes_;
+        // Build a shallow PV for the callback
+        Variation cb_pv;
+        for (int i = 0; i < depth && i < static_cast<int>(pv.moves.size()); ++i) {
+          if (pv.moves[i].from != -1) cb_pv.add(pv.moves[i]);
+        }
+        tmp.pv = cb_pv;
+        callback_(tmp);
       }
     }
     if (score > alpha) alpha = score;

@@ -41,7 +41,7 @@ class Search {
  public:
   explicit Search(Evaluator eval);
 
-  SearchResult search(Board& b, int depth);
+  SearchResult search(Board& b, int depth, std::function<void(const SearchResult&)> cb = nullptr);
 
   void set_stop_flag(std::atomic<bool>* flag) { stop_flag_ = flag; }
 
@@ -50,6 +50,7 @@ class Search {
   int nodes_ = 0;
   static constexpr int kMaxDepth = 64;
   std::atomic<bool>* stop_flag_ = nullptr;
+  std::function<void(const SearchResult&)> callback_ = nullptr;
 
   int negamax_internal(Board& b, int depth, int alpha, int beta, Variation& pv, int ply);
 };

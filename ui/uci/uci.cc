@@ -85,7 +85,7 @@ void Engine::go(int depth, bool infinite, std::function<void(const std::string&)
     if (impl_->search_thread.joinable()) {
       impl_->search_thread.join();
     }
-    impl_->search_thread = std::thread([this, send_info](){
+    impl_->search_thread = std::thread([this, send_info](){ 
       int d = 1;
       while (!impl_->stopped) {
         // Use a local copy of board to avoid data race with position updates
@@ -94,21 +94,23 @@ void Engine::go(int depth, bool infinite, std::function<void(const std::string&)
           std::lock_guard<std::mutex> lk(impl_->mtx);
           board_copy = impl_->board;
         }
-        auto res = impl_->deepener.search_depth(board_copy, d);
+        auto res = impl_->deepener.search_depth(board_copy, d, [&](const SearchResult& partial){
+          send_info(d, partial);
+        });
         {
           std::lock_guard<std::mutex> lk(impl_->mtx);
           impl_->last_best_move = res.best_move.to_string();
         }
-        send_info(d, res);
         ++d;
       }
     });
     return;
   }
   for (int d = 1; d <= maxDepth; ++d) {
-    auto res = impl_->deepener.search_depth(impl_->board, d);
+    auto res = impl_->deepener.search_depth(impl_->board, d, [&](const SearchResult& partial){
+      send_info(d, partial);
+    });
     impl_->last_best_move = res.best_move.to_string();
-    send_info(d, res);
   }
 }
 
