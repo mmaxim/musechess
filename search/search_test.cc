@@ -157,6 +157,26 @@ TEST(Search, PVIsLegalAndProgresses) {
     EXPECT_NE(res.pv.moves[i].from, res.pv.moves[i-2].from) << "PV repeats move at ply " << i;
   }
 }
+
+TEST(Search, ReturnsBestMoveFoundWhenAborted) {
+  auto b = board_from("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+  
+  // Case 1: Abort immediately at root. 
+  // We can't expect a move here because no moves were searched.
+  auto res_instant = searcher.search(b, 1, nullptr, []() { return true; });
+  EXPECT_EQ(res_instant.best_move.from, -1);
+
+  // Case 2: Abort after some moves are searched.
+  int moves_searched = 0;
+  auto res_partial = searcher.search(b, 1, nullptr, [&]() {
+    return ++moves_searched > 5;
+  });
+  
+  // Since at least 5 moves were searched, and they are legal moves from startpos,
+  // the best move should be one of them, not a blank move.
+  EXPECT_NE(res_partial.best_move.from, -1) << "Should return best move found among searched moves";
+}
+
 TEST(Variation, MergeChildCopiesCorrectly) {
   Variation parent;
   Variation child;

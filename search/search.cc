@@ -36,7 +36,7 @@ SearchResult Search<Evaluator>::search(Board& b, int depth, std::function<void(c
 template <typename Evaluator>
 int Search<Evaluator>::negamax_internal(Board& b, int depth, int alpha, int beta, Variation& pv, int ply, std::function<bool()> time_up_cb) {
   if ((stop_flag_ && stop_flag_->load()) || (time_up_cb && time_up_cb())) {
-    return 0;
+    return evaluator_.evaluate(b);
   }
   ++nodes_;
   if (depth <= 0) {
@@ -44,9 +44,7 @@ int Search<Evaluator>::negamax_internal(Board& b, int depth, int alpha, int beta
   }
 
   auto moves = generate_moves(b);
-  if (ply == 0) {
-    std::cerr << "Root moves: " << moves.size() << std::endl;
-  }
+
   if (moves.empty()) {
     if (in_check(b)) {
       return -100000 + depth;
@@ -103,18 +101,14 @@ int Search<Evaluator>::negamax_internal(Board& b, int depth, int alpha, int beta
   int best = std::numeric_limits<int>::min();
   Move best_move{};
   for (auto& m : ordered) {
-    if (ply == 0) {
-      std::cerr << "Trying move " << m.to_string() << std::endl;
-    }
+
     if (stop_flag_ && stop_flag_->load()) break;
     Board child = b;
     child.make_move(m);
     Variation child_pv;
     child_pv.moves.resize(kMaxDepth);
     int score = -negamax_internal(child, depth - 1, -beta, -alpha, child_pv, ply + 1, time_up_cb);
-    if (ply == 0) {
-      std::cerr << "Score for " << m.to_string() << " = " << score << std::endl;
-    }
+
     if (score > best) {
       best = score;
       best_move = m;
@@ -144,7 +138,7 @@ int Search<Evaluator>::negamax_internal(Board& b, int depth, int alpha, int beta
 
 template <typename Evaluator>
 int Search<Evaluator>::quiescent(Board& b, int alpha, int beta, std::function<bool()> time_up_cb) {
-  if ((stop_flag_ && stop_flag_->load()) || (time_up_cb && time_up_cb())) return 0;
+  if ((stop_flag_ && stop_flag_->load()) || (time_up_cb && time_up_cb())) return evaluator_.evaluate(b);
   ++nodes_;
 
   int stand_pat = evaluator_.evaluate(b);

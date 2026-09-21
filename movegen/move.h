@@ -49,6 +49,7 @@ struct Move {
 
   // "e2e4", "e7e8=q", "e1g1", ... (no check/capture suffixes)
   std::string to_string() const {
+    if (from == -1 || to == -1) return "";
     const auto sq_name = [](int sq) {
       return std::string(1, static_cast<char>('a' + bitboard::file_of(sq))) +
              std::string(1, static_cast<char>('1' + bitboard::rank_of(sq)));

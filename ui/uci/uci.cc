@@ -134,7 +134,9 @@ void Engine::go(int depth, bool infinite, std::function<void(const std::string&)
           }, time_up_cb);
           {
             std::lock_guard<std::mutex> lk(impl_->mtx);
-            impl_->last_best_move = res.best_move.to_string();
+            if (res.best_move.from != -1) {
+              impl_->last_best_move = res.best_move.to_string();
+            }
           }
           ++d;
         }
@@ -145,7 +147,9 @@ void Engine::go(int depth, bool infinite, std::function<void(const std::string&)
       auto res = impl_->deepener.search_depth(impl_->board, d, [&](const SearchResult& partial){
         send_info(d, partial);
       }, time_up_cb);
-      impl_->last_best_move = res.best_move.to_string();
+      if (res.best_move.from != -1) {
+        impl_->last_best_move = res.best_move.to_string();
+      }
     }
   }
 }
