@@ -47,6 +47,49 @@ TEST(Search, SearchFindsLegalMoveDepth1) {
   EXPECT_GT(res.nodes, 0);
 }
 
+TEST(Search, SearchReturnsMoveForSideToMove) {
+  auto b = board_from("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+  auto res = searcher.search(b, 1);
+  // Best move must be from a white piece
+  auto piece = b.piece_at(res.best_move.from);
+  ASSERT_NE(piece, kNumPieces);
+  EXPECT_EQ(color_of_piece(piece), Color::White);
+  // Destination must not contain a white piece (unless capture? no captures in start)
+  auto to_piece = b.piece_at(res.best_move.to);
+  if (to_piece != kNumPieces) {
+    EXPECT_EQ(color_of_piece(to_piece), Color::Black);
+  }
+}
+
+TEST(Search, PVStartsWithSideToMove) {
+  auto b = board_from("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+  auto res = searcher.search(b, 6);
+  ASSERT_FALSE(res.pv.moves.empty());
+  // First move in PV must be from side to move (white)
+  auto piece = b.piece_at(res.pv.moves[0].from);
+  ASSERT_NE(piece, kNumPieces);
+  EXPECT_EQ(color_of_piece(piece), Color::White) << "PV first move is not for side to move";
+}
+
+TEST(Search, PVAlternatesColors) {
+  auto b = board_from("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+  IterativeDeepener<MaterialEvaluator> deepener{mat_eval};
+  auto res = deepener.search_depth(b, 6);
+  // Print PV for debugging
+  std::cout << "PV: " << res.pv.to_string() << std::endl;
+  std::cout << "Best move: " << res.best_move.to_string() << std::endl;
+  Board tmp = b;
+  Color expected = Color::White;
+  for (size_t i = 0; i < res.pv.moves.size(); ++i) {
+    auto& m = res.pv.moves[i];
+    auto piece = tmp.piece_at(m.from);
+    ASSERT_NE(piece, kNumPieces) << "Move " << i << " from square empty";
+    EXPECT_EQ(color_of_piece(piece), expected) << "Move " << i << " wrong color";
+    tmp.make_move(m);
+    expected = opponent(expected);
+  }
+}
+
 TEST(Search, SearchDepth1Consistency) {
   auto b = board_from("8/8/8/8/8/3k4/8/4K3 w - - 0 1");
   auto res = searcher.search(b, 1);

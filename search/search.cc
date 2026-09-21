@@ -110,6 +110,7 @@ int Search<Evaluator>::negamax_internal(Board& b, int depth, int alpha, int beta
       best_move = m;
       // Merge child's PV into current variation using Variation helper
       pv.merge_child(child_pv, ply);
+      pv.set(ply, best_move);
       if (ply == 0 && callback_) {
         SearchResult tmp;
         tmp.score = best;
