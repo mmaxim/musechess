@@ -47,7 +47,7 @@ class Search {
   static constexpr int kMaxDepth = 64;
   std::atomic<bool>* stop_flag_ = nullptr;
 
-  int negamax_internal(Board& b, int depth, int alpha, int beta, Move* pv, int ply);
+  int negamax_internal(Board& b, int depth, int alpha, int beta, Variation& pv, int ply);
 };
 
 }  // namespace chess
