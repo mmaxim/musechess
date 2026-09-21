@@ -62,12 +62,12 @@ int main() {
       for (int i=0;i<moves.size();++i) if (moves[i].from==from && moves[i].to==to) ok=true;
       if (!ok) { std::cout << "Illegal move\n"; continue; }
       Move m; m.from=from; m.to=to;
+      std::cout << "You played " << m.to_san(board) << "\n";
       board.make_move(m);
-      std::cout << "You played " << m.to_string() << "\n";
     } else {
       std::cout << "Engine thinking...\n";
       auto res = searcher.search(board, 3);
-      std::cout << "Engine plays " << res.best_move.to_string()
+      std::cout << "Engine plays " << res.best_move.to_san(board)
                 << " score " << res.score
                 << " nodes " << res.nodes << "\n";
       board.make_move(res.best_move);

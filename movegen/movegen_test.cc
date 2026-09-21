@@ -315,3 +315,26 @@ TEST(MoveGen, EnPassantCaptureRemovesPawn) {
   // Square d5 should be empty
   EXPECT_EQ(after.piece_at(35), static_cast<chess::Piece>(chess::kNumPieces));
 }
+
+TEST(MoveGen, SANNotation) {
+  Board b = board_from("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+  MoveList ml = generate_moves(b);
+  // Find e2e4
+  Move m;
+  bool found = false;
+  for (auto& mv : ml) {
+    if (mv.from == 12 && mv.to == 28) { m = mv; found = true; break; }
+  }
+  ASSERT_TRUE(found);
+  EXPECT_EQ(m.to_san(b), "e4");
+  // Find N move
+  bool found_n = false;
+  for (auto& mv : ml) {
+    if (mv.from == 6 && mv.to == 21) { // g1f3
+      EXPECT_EQ(mv.to_san(b), "Nf3");
+      found_n = true;
+      break;
+    }
+  }
+  EXPECT_TRUE(found_n);
+}

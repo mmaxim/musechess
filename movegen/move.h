@@ -6,6 +6,7 @@
 #include "bitboard.h"
 
 namespace chess {
+class Board;
 
 enum class PieceType : std::uint8_t {
   Pawn,
@@ -59,16 +60,17 @@ struct Move {
     }
     return s;
   }
+
+  // Standard Algebraic Notation, requires board context
+  std::string to_san(const Board& board) const;
 };
 
-// Small fixed-capacity container. Max pseudo-legal moves in chess is well
-// below 256, so this never grows or allocates.
 class MoveList {
  public:
   static constexpr int kMax = 256;
 
   void add(Move m) {
-    if (count_ >= kMax) return;  // Unreachable in legal chess; kept as a guard.
+    if (count_ >= kMax) return;
     moves_[count_++] = m;
   }
   int size() const { return count_; }
