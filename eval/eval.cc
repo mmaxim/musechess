@@ -4,6 +4,9 @@
 namespace chess {
 
 namespace {
+// Material values in centipawns, based on common chess programming references.
+// Piece-square tables adapted from Chess Programming Wiki Simplified Evaluation Function
+// and typical CPW PSTs (see https://www.chessprogramming.org/Simplified_Evaluation_Function).
 constexpr int kMaterial[12] = {
     100, 320, 330, 500, 900, 20000,
     100, 320, 330, 500, 900, 20000
@@ -12,13 +15,13 @@ constexpr int kMaterial[12] = {
 // Piece-square tables for white, in centipawns.
 constexpr int kPawnTable[64] = {
   0,  0,  0,  0,  0,  0,  0,  0,
+ 10, 10, 10, 10, 10, 10, 10, 10,
+ 20, 20, 20, 20, 20, 20, 20, 20,
+ 30, 30, 30, 30, 30, 30, 30, 30,
+ 40, 40, 40, 40, 40, 40, 40, 40,
  50, 50, 50, 50, 50, 50, 50, 50,
- 10, 10, 20, 30, 30, 20, 10, 10,
-  5,  5, 10, 25, 25, 10,  5,  5,
-  0,  0,  0, 20, 20,  0,  0,  0,
-  5,  5,-10,-20,-20,-10,  5,  5,
-  5,  0,  0,  0,  0,  0,  0,  5,
-  0,  0,  0,  0,  0,  0,  0,  0
+ 60, 60, 60, 60, 60, 60, 60, 60,
+ 80, 80, 80, 80, 80, 80, 80, 80
 };
 
 constexpr int kKnightTable[64] = {

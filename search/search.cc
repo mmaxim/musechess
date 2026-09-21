@@ -1,7 +1,10 @@
 #include "search.h"
 #include "eval/eval.h"
 
+#include <algorithm>
+#include <array>
 #include <limits>
+#include <vector>
 
 namespace chess {
 
@@ -46,9 +49,55 @@ int Search<Evaluator>::negamax_internal(Board& b, int depth, int alpha, int beta
     return 0;
   }
 
+  // Simple move ordering: captures first, then promotions.
+  std::vector<Move> ordered;
+  ordered.reserve(moves.size());
+  for (auto& m : moves) ordered.push_back(m);
+  auto me = b.side_to_move;
+  auto opp = opponent(me);
+  auto score_move = [&](const Move& m) -> int {
+    int score = 0;
+    bool is_capture = false;
+    if (m.has_flag(Move::kEnPassant)) {
+      is_capture = true;
+    } else {
+      auto to_piece = b.piece_at(m.to);
+      if (to_piece != chess::kNumPieces && color_of_piece(to_piece) == opp) {
+        is_capture = true;
+      }
+    }
+    if (m.promotion != PieceType::None) {
+      score += 100000;
+    }
+    if (is_capture) {
+      auto captured_piece = b.piece_at(m.to);
+      if (m.has_flag(Move::kEnPassant)) {
+        captured_piece = (me == Color::White) ? kBlackPawn : kWhitePawn;
+      }
+      auto mover_piece = b.piece_at(m.from);
+      int captured_val = 0;
+      int mover_val = 0;
+      auto vals = std::array<int,6>{100, 320, 330, 500, 900, 20000};
+      if (captured_piece != chess::kNumPieces) captured_val = vals[static_cast<int>(type_of_piece(captured_piece))];
+      if (mover_piece != chess::kNumPieces) mover_val = vals[static_cast<int>(type_of_piece(mover_piece))];
+      score += 10000 + captured_val - mover_val;
+    }
+    // Slight preference for central moves
+    {
+      int r = bitboard::rank_of(m.to);
+      int f = bitboard::file_of(m.to);
+      int centrality = 3 - std::abs(r - 3) - std::abs(f - 3);
+      score += centrality;
+    }
+    return score;
+  };
+  std::sort(ordered.begin(), ordered.end(), [&](const Move& a, const Move& b){
+    return score_move(a) > score_move(b);
+  });
+
   int best = std::numeric_limits<int>::min();
   Move best_move{};
-  for (auto& m : moves) {
+  for (auto& m : ordered) {
     if (stop_flag_ && stop_flag_->load()) break;
     Board child = b;
     child.make_move(m);

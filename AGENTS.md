@@ -1,2 +1,3 @@
 - Always use modern C++20 conventions when possible
 - Make tests aggressively, do not make one off programs to test things and then delete them.
+- Use build.bat to build everything
