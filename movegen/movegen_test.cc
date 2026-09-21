@@ -52,9 +52,10 @@ TEST(MoveGen, StartPositionPerftDepth2Breakdown) {
     std::uint64_t cnt = 0;
     for (const Move& m2 : generate_moves(n)) ++cnt;
     total += cnt;
+    // std::cout << m.to_string() << " " << cnt << std::endl;
   }
   EXPECT_EQ(total, 400);
-}
+} 
 
 TEST(MoveGen, KiwiPetePerftDepth1) {
   Board b = board_from("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
@@ -182,35 +183,82 @@ TEST(MoveGen, PinnedPieceCannotExposeCheck) {
   EXPECT_EQ(ml.size(), 8);            // 6 rook + 2 king
 }
 
-TEST(MoveGen, PerftStartPosition) {
+TEST(MoveGen, PerftStartPositionDepth1) {
   Board b = board_from("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
   EXPECT_EQ(perft(b, 1), 20);
+}
+TEST(MoveGen, PerftStartPositionDepth2) {
+  Board b = board_from("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
   EXPECT_EQ(perft(b, 2), 400);
+}
+TEST(MoveGen, PerftStartPositionDepth3) {
+  Board b = board_from("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
   EXPECT_EQ(perft(b, 3), 8902);
+}
+TEST(MoveGen, PerftStartPositionDepth4) {
+  Board b = board_from("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
   EXPECT_EQ(perft(b, 4), 197281);
+}
+TEST(MoveGen, PerftStartPositionDepth5) {
+  Board b = board_from("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
   EXPECT_EQ(perft(b, 5), 4865609);
 }
 
-TEST(MoveGen, PerftKiwiPete) {
+TEST(MoveGen, PerftKiwiPeteDepth1) {
   Board b = board_from("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
   EXPECT_EQ(perft(b, 1), 48);
+}
+TEST(MoveGen, PerftKiwiPeteDepth2) {
+  Board b = board_from("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
+  // Debug breakdown
+  std::uint64_t total = 0;
+  for (const Move& m : generate_moves(b)) {
+    Board n = b;
+    n.make_move(m);
+    std::uint64_t cnt = 0;
+    for (const Move& m2 : generate_moves(n)) ++cnt;
+    total += cnt;
+    // std::cout << m.to_string() << " " << cnt << std::endl;
+  }
+  EXPECT_EQ(total, 2039);
   EXPECT_EQ(perft(b, 2), 2039);
+}
+TEST(MoveGen, PerftKiwiPeteDepth3) {
+  Board b = board_from("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
   EXPECT_EQ(perft(b, 3), 97862);
+}
+TEST(MoveGen, PerftKiwiPeteDepth4) {
+  Board b = board_from("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
   EXPECT_EQ(perft(b, 4), 4085603);
 }
 
-TEST(MoveGen, PerftPosition3) {
+TEST(MoveGen, PerftPosition3Depth1) {
   Board b = board_from("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1");
   EXPECT_EQ(perft(b, 1), 14);
+}
+TEST(MoveGen, PerftPosition3Depth2) {
+  Board b = board_from("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1");
   EXPECT_EQ(perft(b, 2), 191);
+}
+TEST(MoveGen, PerftPosition3Depth3) {
+  Board b = board_from("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1");
   EXPECT_EQ(perft(b, 3), 2812);
 }
 
-TEST(MoveGen, PerftPosition4) {
+TEST(MoveGen, PerftPosition4Depth1) {
   Board b = board_from("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1");
   EXPECT_EQ(perft(b, 1), 6);
+}
+TEST(MoveGen, PerftPosition4Depth2) {
+  Board b = board_from("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1");
   EXPECT_EQ(perft(b, 2), 264);
+}
+TEST(MoveGen, PerftPosition4Depth3) {
+  Board b = board_from("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1");
   EXPECT_EQ(perft(b, 3), 9467);
+}
+TEST(MoveGen, PerftPosition4Depth4) {
+  Board b = board_from("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1");
   EXPECT_EQ(perft(b, 4), 422333);
 }
 

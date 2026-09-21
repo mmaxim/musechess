@@ -162,14 +162,30 @@ void gen_pawn_moves(const Board& b, MoveList& out) {
       out.add(m);
     }
     // Captures.
-    U64 caps = (shift_dir(pawns, 1, 1) | shift_dir(pawns, 1, -1)) & enemies;
-    while (caps) {
-      const int d = ctz(caps);
-      caps &= caps - 1;
-      Move m;
-      m.to = d;
-      m.from = test_bit(pawns, d - 9) ? d - 9 : d - 7;
-      emit(m);
+    {
+      U64 pawn_bits = pawns;
+      while (pawn_bits) {
+        const int sq = ctz(pawn_bits);
+        pawn_bits &= pawn_bits - 1;
+        U64 left = shift_dir(set_bit(sq), 1, -1) & enemies;
+        while (left) {
+          const int d = ctz(left);
+          left &= left - 1;
+          Move m;
+          m.from = sq;
+          m.to = d;
+          emit(m);
+        }
+        U64 right = shift_dir(set_bit(sq), 1, 1) & enemies;
+        while (right) {
+          const int d = ctz(right);
+          right &= right - 1;
+          Move m;
+          m.from = sq;
+          m.to = d;
+          emit(m);
+        }
+      }
     }
     // En-passant.
     if (b.ep_square >= 0) {
@@ -210,14 +226,30 @@ void gen_pawn_moves(const Board& b, MoveList& out) {
       out.add(m);
     }
     // Captures.
-    U64 caps = (shift_dir(pawns, -1, 1) | shift_dir(pawns, -1, -1)) & enemies;
-    while (caps) {
-      const int d = ctz(caps);
-      caps &= caps - 1;
-      Move m;
-      m.to = d;
-      m.from = test_bit(pawns, d + 9) ? d + 9 : d + 7;
-      emit(m);
+    {
+      U64 pawn_bits = pawns;
+      while (pawn_bits) {
+        const int sq = ctz(pawn_bits);
+        pawn_bits &= pawn_bits - 1;
+        U64 left = shift_dir(set_bit(sq), -1, -1) & enemies;
+        while (left) {
+          const int d = ctz(left);
+          left &= left - 1;
+          Move m;
+          m.from = sq;
+          m.to = d;
+          emit(m);
+        }
+        U64 right = shift_dir(set_bit(sq), -1, 1) & enemies;
+        while (right) {
+          const int d = ctz(right);
+          right &= right - 1;
+          Move m;
+          m.from = sq;
+          m.to = d;
+          emit(m);
+        }
+      }
     }
     // En-passant.
     if (b.ep_square >= 0) {
