@@ -268,3 +268,50 @@ TEST(MoveGen, PerftPosition5) {
   EXPECT_EQ(perft(b, 2), 1486);
   EXPECT_EQ(perft(b, 3), 62379);
 }
+
+TEST(MoveGen, CastlingKingsideThroughCheckByKnight) {
+  // Black knight on g3 attacks f1, so white cannot castle kingside through f1/g1.
+  Board b = board_from("4k3/8/8/8/8/6n1/8/4K2R w K - 0 1");
+  const MoveList ml = generate_moves(b);
+  EXPECT_FALSE(has_move(ml, 4, 6));  // e1g1 castling illegal
+  // King can still move to d1, which is safe
+  EXPECT_TRUE(has_move(ml, 4, 3));
+}
+
+TEST(MoveGen, CastlingQueensideThroughCheckByBishop) {
+  // Black bishop on a4 attacks d1, blocking queenside castling through d1/c1.
+  Board b = board_from("4k3/8/8/8/b7/8/8/R3K2R w Q - 0 1");
+  const MoveList ml = generate_moves(b);
+  EXPECT_FALSE(has_move(ml, 4, 2));  // e1c1 castling illegal
+}
+
+TEST(MoveGen, EnPassantTwoCapturers) {
+  // White pawns on e5 and g5, black just played f7-f5, ep square f6.
+  // Both e5xf6 e.p. and g5xf6 e.p. should be generated.
+  Board b = board_from("4k3/8/8/4PpP1/8/8/8/4K3 w - f6 0 1");
+  const MoveList ml = generate_moves(b);
+  EXPECT_TRUE(has_move(ml, 36, 45));  // e5xf6 e.p.
+  EXPECT_TRUE(has_move(ml, 38, 45));  // g5xf6 e.p.
+  // Exactly two en passant captures
+  int ep_count = 0;
+  for (const auto& m : ml) {
+    if (m.has_flag(Move::kEnPassant)) ++ep_count;
+  }
+  EXPECT_EQ(ep_count, 2);
+}
+
+TEST(MoveGen, EnPassantCaptureRemovesPawn) {
+  Board b = board_from("4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1");
+  const MoveList ml = generate_moves(b);
+  EXPECT_TRUE(has_move(ml, 36, 43));  // e5xd6 e.p.
+  // Make the capture and verify the captured pawn disappears
+  Board after = b;
+  for (const auto& m : ml) {
+    if (m.from == 36 && m.to == 43) {
+      after.make_move(m);
+      break;
+    }
+  }
+  // Square d5 should be empty
+  EXPECT_EQ(after.piece_at(35), static_cast<chess::Piece>(chess::kNumPieces));
+}
