@@ -18,6 +18,13 @@ int main() {
   Engine engine;
   std::string line;
   while (std::getline(std::cin, line)) {
+    // Strip UTF-8 BOM if present
+    if (line.size() >= 3 && 
+        static_cast<unsigned char>(line[0]) == 0xEF && 
+        static_cast<unsigned char>(line[1]) == 0xBB && 
+        static_cast<unsigned char>(line[2]) == 0xBF) {
+      line = line.substr(3);
+    }
     log_line(log, "> " + line);
     std::istringstream iss(line);
     std::string cmd;
