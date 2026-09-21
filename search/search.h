@@ -8,6 +8,7 @@
 #include <limits>
 #include <vector>
 #include <atomic>
+#include <climits>
 
 namespace chess {
 
@@ -18,6 +19,15 @@ struct Variation {
   void set(int ply, const Move& m) {
     if (moves.size() <= static_cast<size_t>(ply)) moves.resize(ply + 1);
     moves[ply] = m;
+  }
+  void merge_child(const Variation& child, int ply) {
+    // Copy child's PV from ply+1 onward into this variation.
+    for (size_t i = static_cast<size_t>(ply + 1); i < child.moves.size(); ++i) {
+      const Move& m = child.moves[i];
+      if (m.from == -1) break;
+      if (moves.size() <= i) moves.resize(i + 1);
+      moves[i] = m;
+    }
   }
   std::string to_string() const {
     std::string s;

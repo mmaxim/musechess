@@ -114,3 +114,4 @@ TEST(Search, PVIsLegalAndProgresses) {
     EXPECT_NE(res.pv.moves[i].from, res.pv.moves[i-2].from) << "PV repeats move at ply " << i;
   }
 }
+TEST(Variation, MergeChildCopiesCorrectly) { Variation parent; Variation child; Move m1; m1.from=1; m1.to=2; Move m2; m2.from=3; m2.to=4; Move m3; m3.from=5; m3.to=6; child.set(1,m1); child.set(2,m2); child.set(3,m3); Move m0; m0.from=0; m0.to=0; parent.set(0,m0); parent.merge_child(child,0); EXPECT_EQ(parent.moves.size(),4u); EXPECT_EQ(parent.moves[0].from,0); EXPECT_EQ(parent.moves[1].from,1); EXPECT_EQ(parent.moves[2].from,3); EXPECT_EQ(parent.moves[3].from,5); }
