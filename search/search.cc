@@ -131,6 +131,94 @@ int Search<Evaluator>::negamax_internal(Board& b, int depth, int alpha, int beta
   return best;
 }
 
+template <typename Evaluator>
+int Search<Evaluator>::quiescent(Board& b, int alpha, int beta) {
+  if (stop_flag_ && stop_flag_->load()) {
+    return 0;
+  }
+  ++nodes_;
+  int stand_pat = evaluator_.evaluate(b);
+  if (stand_pat >= beta) {
+    return beta;
+  }
+  if (alpha < stand_pat) {
+    alpha = stand_pat;
+  }
+
+  auto moves = generate_moves(b);
+  auto me = b.side_to_move;
+  auto opp = opponent(me);
+
+  std::vector<Move> candidates;
+  candidates.reserve(moves.size());
+  for (auto& m : moves) {
+    bool is_capture = false;
+    if (m.has_flag(Move::kEnPassant)) {
+      is_capture = true;
+    } else {
+      auto to_piece = b.piece_at(m.to);
+      if (to_piece != chess::kNumPieces && color_of_piece(to_piece) == opp) {
+        is_capture = true;
+      }
+    }
+    bool is_promotion = m.promotion != PieceType::None;
+    if (is_capture || is_promotion || m.has_flag(Move::kEnPassant)) {
+      candidates.push_back(m);
+      continue;
+    }
+    // Include checking moves
+    Board tmp = b;
+    tmp.make_move(m);
+    if (in_check(tmp)) {
+      candidates.push_back(m);
+    }
+  }
+
+  // Simple ordering: captures with MVV-LVA first
+  auto score_move = [&](const Move& m) -> int {
+    int score = 0;
+    bool is_capture = false;
+    if (m.has_flag(Move::kEnPassant)) {
+      is_capture = true;
+    } else {
+      auto to_piece = b.piece_at(m.to);
+      if (to_piece != chess::kNumPieces && color_of_piece(to_piece) == opp) {
+        is_capture = true;
+      }
+    }
+    if (m.promotion != PieceType::None) {
+      score += 100000;
+    }
+    if (is_capture) {
+      auto captured_piece = b.piece_at(m.to);
+      if (m.has_flag(Move::kEnPassant)) {
+        captured_piece = (me == Color::White) ? kBlackPawn : kWhitePawn;
+      }
+      auto mover_piece = b.piece_at(m.from);
+      int captured_val = 0;
+      int mover_val = 0;
+      auto vals = std::array<int,6>{100, 320, 330, 500, 900, 20000};
+      if (captured_piece != chess::kNumPieces) captured_val = vals[static_cast<int>(type_of_piece(captured_piece))];
+      if (mover_piece != chess::kNumPieces) mover_val = vals[static_cast<int>(type_of_piece(mover_piece))];
+      score += 10000 + captured_val - mover_val;
+    }
+    return score;
+  };
+  std::sort(candidates.begin(), candidates.end(), [&](const Move& a, const Move& b) {
+    return score_move(a) > score_move(b);
+  });
+
+  for (auto& m : candidates) {
+    if (stop_flag_ && stop_flag_->load()) break;
+    Board child = b;
+    child.make_move(m);
+    int score = -quiescent(child, -beta, -alpha);
+    if (score > alpha) alpha = score;
+    if (alpha >= beta) break;
+  }
+  return alpha;
+}
+
 // Explicit instantiation for the evaluators we know about
 template class Search<class MaterialEvaluator>;
 

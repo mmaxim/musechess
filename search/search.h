@@ -63,6 +63,7 @@ class Search {
   std::function<void(const SearchResult&)> callback_ = nullptr;
 
   int negamax_internal(Board& b, int depth, int alpha, int beta, Variation& pv, int ply);
+  int quiescent(Board& b, int alpha, int beta);
 };
 
 }  // namespace chess
