@@ -114,24 +114,3 @@ TEST(Search, PVIsLegalAndProgresses) {
     EXPECT_NE(res.pv.moves[i].from, res.pv.moves[i-2].from) << "PV repeats move at ply " << i;
   }
 }
-
-TEST(Search, DebugStartBestMove) {
-  auto b = board_from("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-  std::cout << "Start eval " << mat_eval.evaluate(b) << std::endl;
-  for (int d = 1; d <= 4; ++d) {
-    auto res = searcher.search(b, d);
-    std::cout << "Depth " << d << " best " << res.best_move.to_string() << " score " << res.score << " PV " << res.pv.to_string() << std::endl;
-  }
-  // Check a2a3 evaluation
-  Board b2 = b;
-  // find a2a3 move
-  auto moves = generate_moves(b2);
-  for (auto& m : moves) {
-    if (m.from == 8 && m.to == 16) {
-      Board after = b2;
-      after.make_move(m);
-      std::cout << "Eval after a2a3 " << mat_eval.evaluate(after) << std::endl;
-    }
-  }
-  EXPECT_TRUE(true);
-}
