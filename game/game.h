@@ -30,8 +30,15 @@ class ComputerPlayer final : public Player {
 struct Clock {
   std::chrono::milliseconds white_time{std::chrono::minutes(5)};
   std::chrono::milliseconds black_time{std::chrono::minutes(5)};
-  std::chrono::milliseconds increment{0};
+  std::chrono::milliseconds white_inc{0};
+  std::chrono::milliseconds black_inc{0};
 
+  void set_time(Color c, std::chrono::milliseconds t) {
+    if (c == Color::White) white_time = t; else black_time = t;
+  }
+  void set_inc(Color c, std::chrono::milliseconds inc) {
+    if (c == Color::White) white_inc = inc; else black_inc = inc;
+  }
   void tick(Color c, std::chrono::milliseconds elapsed);
   bool is_time_up(Color c) const;
 };

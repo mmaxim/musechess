@@ -37,6 +37,7 @@ FetchContent_MakeAvailable(googletest)
 
 add_executable(tests
   movegen/board_test.cc
+  movegen/move_test.cc
   movegen/movegen_test.cc
   search/search_test.cc
   game/game_test.cc

@@ -48,7 +48,27 @@ std::string Move::to_san(const Board& board) const {
     }
   } else {
     s += piece_char(pt);
-    // Simple disambiguation: omit for now
+    {
+      auto moves = generate_moves(board);
+      int count = 0;
+      bool same_file = true;
+      int common_file = bitboard::file_of(from);
+      int common_rank = bitboard::rank_of(from);
+      for (const auto& m : moves) {
+        if (m.to == to && type_of_piece(board.piece_at(m.from)) == pt) {
+          count++;
+          if (bitboard::file_of(m.from) != common_file) same_file = false;
+          if (bitboard::rank_of(m.from) != common_rank) common_rank = -1;
+        }
+      }
+      if (count > 1) {
+        if (same_file) {
+          s += static_cast<char>('1' + bitboard::rank_of(from));
+        } else {
+          s += static_cast<char>('a' + bitboard::file_of(from));
+        }
+      }
+    }
     if (is_capture) s += 'x';
     s += sq_name(to);
     if (is_promotion) {

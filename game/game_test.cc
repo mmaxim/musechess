@@ -7,7 +7,7 @@ using namespace chess;
 TEST(Game, ClockTick) {
   Clock c;
   c.white_time = std::chrono::seconds(10);
-  c.increment = std::chrono::seconds(1);
+  c.set_inc(Color::White, std::chrono::seconds(1));
   c.tick(Color::White, std::chrono::seconds(3));
   EXPECT_EQ(c.white_time.count(), 8000);
 }

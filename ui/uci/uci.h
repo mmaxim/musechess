@@ -17,6 +17,7 @@ class Engine {
   Engine();
   ~Engine();
   void set_option(const std::string& key, const std::string& value);
+  void set_time_control(const std::string& key, const std::string& value);
   void uci_new_game();
   void position(const std::string& fen, const std::vector<std::string>& moves);
   void go(int depth = -1, bool infinite = false, std::function<void(const std::string&)> info_cb = nullptr);

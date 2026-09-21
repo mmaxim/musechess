@@ -11,11 +11,11 @@ void Clock::tick(Color c, std::chrono::milliseconds elapsed) {
   if (c == Color::White) {
     white_time -= elapsed;
     if (white_time < std::chrono::milliseconds(0)) white_time = std::chrono::milliseconds(0);
-    white_time += increment;
+    white_time += white_inc;
   } else {
     black_time -= elapsed;
     if (black_time < std::chrono::milliseconds(0)) black_time = std::chrono::milliseconds(0);
-    black_time += increment;
+    black_time += black_inc;
   }
 }
 

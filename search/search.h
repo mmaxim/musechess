@@ -51,7 +51,7 @@ class Search {
  public:
   explicit Search(Evaluator eval);
 
-  SearchResult search(Board& b, int depth, std::function<void(const SearchResult&)> cb = nullptr);
+  SearchResult search(Board& b, int depth, std::function<void(const SearchResult&)> cb = nullptr, std::function<bool()> time_up_cb = nullptr);
 
   void set_stop_flag(std::atomic<bool>* flag) { stop_flag_ = flag; }
 
@@ -62,8 +62,8 @@ class Search {
   std::atomic<bool>* stop_flag_ = nullptr;
   std::function<void(const SearchResult&)> callback_ = nullptr;
 
-  int negamax_internal(Board& b, int depth, int alpha, int beta, Variation& pv, int ply);
-  int quiescent(Board& b, int alpha, int beta);
+  int negamax_internal(Board& b, int depth, int alpha, int beta, Variation& pv, int ply, std::function<bool()> time_up_cb = nullptr);
+  int quiescent(Board& b, int alpha, int beta, std::function<bool()> time_up_cb = nullptr);
 };
 
 }  // namespace chess

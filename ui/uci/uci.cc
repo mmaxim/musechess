@@ -1,6 +1,7 @@
 #include "uci.h"
 #include <memory>
 #include "movegen/board.h"
+#include "game/game.h"
 #include "search/iterative_deepener.h"
 #include "movegen/movegen.h"
 #include "search/search.h"
@@ -19,6 +20,7 @@ class Engine::Impl {
  public:
   Board board;
   Options opts;
+  Clock game_clock;
   IterativeDeepener<MaterialEvaluator> deepener{MaterialEvaluator{}};
   std::string last_best_move;
   std::atomic<bool> stopped{false};
@@ -39,6 +41,17 @@ void Engine::set_option(const std::string& key, const std::string& value) {
   if (key == "Depth") {
     try { impl_->opts.depth = std::stoi(value); } catch (...) {}
   }
+}
+
+void Engine::set_time_control(const std::string& key, const std::string& value) {
+  try {
+    int val = std::stoi(value);
+    auto ms = std::chrono::milliseconds(val);
+    if (key == "wtime") impl_->game_clock.set_time(Color::White, ms);
+    else if (key == "btime") impl_->game_clock.set_time(Color::Black, ms);
+    else if (key == "winc") impl_->game_clock.set_inc(Color::White, ms);
+    else if (key == "binc") impl_->game_clock.set_inc(Color::Black, ms);
+  } catch (...) {}
 }
 
 void Engine::uci_new_game() {
@@ -80,37 +93,60 @@ void Engine::go(int depth, bool infinite, std::function<void(const std::string&)
       }
     }
   };
-  if (infinite) {
-    // Run iterative deepening in a background thread so stop/quit can be processed
-    if (impl_->search_thread.joinable()) {
-      impl_->search_thread.join();
-    }
-    impl_->search_thread = std::thread([this, send_info](){ 
-      int d = 1;
-      while (!impl_->stopped) {
-        // Use a local copy of board to avoid data race with position updates
-        Board board_copy;
-        {
-          std::lock_guard<std::mutex> lk(impl_->mtx);
-          board_copy = impl_->board;
-        }
-        auto res = impl_->deepener.search_depth(board_copy, d, [&](const SearchResult& partial){
-          send_info(d, partial);
-        });
-        {
-          std::lock_guard<std::mutex> lk(impl_->mtx);
-          impl_->last_best_move = res.best_move.to_string();
-        }
-        ++d;
+  {
+    auto move_start = std::chrono::steady_clock::now();
+    
+    // Decide time limit for this move.
+    std::chrono::milliseconds time_limit{10000}; // Default 10s
+    if (impl_->board.side_to_move == Color::White) {
+      auto remaining = impl_->game_clock.white_time;
+      if (remaining > std::chrono::milliseconds(0)) {
+        time_limit = std::min(std::chrono::milliseconds(5000), remaining / 10);
       }
-    });
-    return;
-  }
-  for (int d = 1; d <= maxDepth; ++d) {
-    auto res = impl_->deepener.search_depth(impl_->board, d, [&](const SearchResult& partial){
-      send_info(d, partial);
-    });
-    impl_->last_best_move = res.best_move.to_string();
+    } else {
+      auto remaining = impl_->game_clock.black_time;
+      if (remaining > std::chrono::milliseconds(0)) {
+        time_limit = std::min(std::chrono::milliseconds(5000), remaining / 10);
+      }
+    }
+
+    auto time_up_cb = [&move_start, time_limit]() {
+      auto now = std::chrono::steady_clock::now();
+      return std::chrono::duration_cast<std::chrono::milliseconds>(now - move_start) >= time_limit;
+    };
+
+    if (infinite) {
+      // Run iterative deepening in a background thread so stop/quit can be processed
+      if (impl_->search_thread.joinable()) {
+        impl_->search_thread.join();
+      }
+      impl_->search_thread = std::thread([this, send_info, time_up_cb](){ 
+        int d = 1;
+        while (!impl_->stopped) {
+          // Use a local copy of board to avoid data race with position updates
+          Board board_copy;
+          {
+            std::lock_guard<std::mutex> lk(impl_->mtx);
+            board_copy = impl_->board;
+          }
+          auto res = impl_->deepener.search_depth(board_copy, d, [&](const SearchResult& partial){
+            send_info(d, partial);
+          }, time_up_cb);
+          {
+            std::lock_guard<std::mutex> lk(impl_->mtx);
+            impl_->last_best_move = res.best_move.to_string();
+          }
+          ++d;
+        }
+      });
+      return;
+    }
+    for (int d = 1; d <= maxDepth; ++d) {
+      auto res = impl_->deepener.search_depth(impl_->board, d, [&](const SearchResult& partial){
+        send_info(d, partial);
+      }, time_up_cb);
+      impl_->last_best_move = res.best_move.to_string();
+    }
   }
 }
 

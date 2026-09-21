@@ -29,6 +29,17 @@ int main() {
       log_line(log, "uciok");
     } else if (cmd == "isready") {
       log_line(log, "readyok");
+    } else if (cmd == "ucisetoptions") {
+      std::string opt;
+      iss >> opt;
+      if (opt == "timecontrol") {
+        std::string key;
+        while (iss >> key) {
+          std::string val;
+          if (!(iss >> val)) break;
+          engine.set_time_control(key, val);
+        }
+      }
     } else if (cmd == "ucinewgame") {
       engine.uci_new_game();
     } else if (cmd == "position") {
