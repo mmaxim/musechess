@@ -36,8 +36,8 @@ U64 knight_attack_mask(U64 knights) {
     auto sq = ctz(knights);
     knights &= knights - 1;
     for (const Dir& d : kKnightDirs) {
-      const int r = rank_of(sq) + d.dr;
-      const int f = file_of(sq) + d.df;
+      auto r = rank_of(sq) + d.dr;
+      auto f = file_of(sq) + d.df;
       if (r < 0 || r > 7 || f < 0 || f > 7) continue;
       out |= set_bit(square(r, f));
     }
@@ -52,8 +52,8 @@ U64 king_attack_mask(U64 kings) {
     auto sq = ctz(kings);
     kings &= kings - 1;
     for (const Dir& d : kKingDirs) {
-      const int r = rank_of(sq) + d.dr;
-      const int f = file_of(sq) + d.df;
+      auto r = rank_of(sq) + d.dr;
+      auto f = file_of(sq) + d.df;
       if (r < 0 || r > 7 || f < 0 || f > 7) continue;
       out |= set_bit(square(r, f));
     }
@@ -110,7 +110,7 @@ U64 attacked_by(const Board& b, Color c) {
 }
 
 bool in_check(const Board& b) {
-  const U64 king = b.masks[piece_index(b.side_to_move, PieceType::King)];
+  const auto king = b.masks[piece_index(b.side_to_move, PieceType::King)];
   return (attacked_by(b, opponent(b.side_to_move)) & king) != 0;
 }
 
@@ -139,9 +139,9 @@ void gen_pawn_moves(const Board& b, MoveList& out) {
 
   if (white) {
     // Single pushes.
-    U64 pushes = (pawns << 8) & ~occ;
+    auto pushes = (pawns << 8) & ~occ;
     while (pushes) {
-      const int d = ctz(pushes);
+      auto d = ctz(pushes);
       pushes &= pushes - 1;
       Move m;
       m.from = d - 8;
@@ -149,11 +149,11 @@ void gen_pawn_moves(const Board& b, MoveList& out) {
       emit(m);
     }
     // Double pushes.
-    U64 doubles = (pawns & rank_mask(1)) << 16 & ~occ;
+    auto doubles = (pawns & rank_mask(1)) << 16 & ~occ;
     while (doubles) {
-      const int d = ctz(doubles);
+      auto d = ctz(doubles);
       doubles &= doubles - 1;
-      const int origin = d - 16;
+      auto origin = d - 16;
       if (test_bit(occ, origin + 8)) continue;  // Path blocked.
       Move m;
       m.from = origin;
@@ -163,22 +163,22 @@ void gen_pawn_moves(const Board& b, MoveList& out) {
     }
     // Captures.
     {
-      U64 pawn_bits = pawns;
+      auto pawn_bits = pawns;
       while (pawn_bits) {
-        const int sq = ctz(pawn_bits);
+        auto sq = ctz(pawn_bits);
         pawn_bits &= pawn_bits - 1;
-        U64 left = shift_dir(set_bit(sq), 1, -1) & enemies;
+        auto left = shift_dir(set_bit(sq), 1, -1) & enemies;
         while (left) {
-          const int d = ctz(left);
+          auto d = ctz(left);
           left &= left - 1;
           Move m;
           m.from = sq;
           m.to = d;
           emit(m);
         }
-        U64 right = shift_dir(set_bit(sq), 1, 1) & enemies;
+        auto right = shift_dir(set_bit(sq), 1, 1) & enemies;
         while (right) {
-          const int d = ctz(right);
+          auto d = ctz(right);
           right &= right - 1;
           Move m;
           m.from = sq;
@@ -189,10 +189,10 @@ void gen_pawn_moves(const Board& b, MoveList& out) {
     }
     // En-passant.
     if (b.ep_square >= 0) {
-      const U64 ep_mask = set_bit(b.ep_square);
-      U64 capturers = pawns & (shift_dir(ep_mask, -1, 1) | shift_dir(ep_mask, -1, -1));
+      const auto ep_mask = set_bit(b.ep_square);
+      auto capturers = pawns & (shift_dir(ep_mask, -1, 1) | shift_dir(ep_mask, -1, -1));
       while (capturers) {
-        const int o = ctz(capturers);
+        auto o = ctz(capturers);
         capturers &= capturers - 1;
         Move m;
         m.from = o;
@@ -203,9 +203,9 @@ void gen_pawn_moves(const Board& b, MoveList& out) {
     }
   } else {
     // Single pushes.
-    U64 pushes = (pawns >> 8) & ~occ;
+    auto pushes = (pawns >> 8) & ~occ;
     while (pushes) {
-      const int d = ctz(pushes);
+      auto d = ctz(pushes);
       pushes &= pushes - 1;
       Move m;
       m.from = d + 8;
@@ -213,11 +213,11 @@ void gen_pawn_moves(const Board& b, MoveList& out) {
       emit(m);
     }
     // Double pushes.
-    U64 doubles = (pawns & rank_mask(6)) >> 16 & ~occ;
+    auto doubles = (pawns & rank_mask(6)) >> 16 & ~occ;
     while (doubles) {
-      const int d = ctz(doubles);
+      auto d = ctz(doubles);
       doubles &= doubles - 1;
-      const int origin = d + 16;
+      auto origin = d + 16;
       if (test_bit(occ, origin - 8)) continue;  // Path blocked.
       Move m;
       m.from = origin;
@@ -227,22 +227,22 @@ void gen_pawn_moves(const Board& b, MoveList& out) {
     }
     // Captures.
     {
-      U64 pawn_bits = pawns;
+      auto pawn_bits = pawns;
       while (pawn_bits) {
-        const int sq = ctz(pawn_bits);
+        auto sq = ctz(pawn_bits);
         pawn_bits &= pawn_bits - 1;
-        U64 left = shift_dir(set_bit(sq), -1, -1) & enemies;
+        auto left = shift_dir(set_bit(sq), -1, -1) & enemies;
         while (left) {
-          const int d = ctz(left);
+          auto d = ctz(left);
           left &= left - 1;
           Move m;
           m.from = sq;
           m.to = d;
           emit(m);
         }
-        U64 right = shift_dir(set_bit(sq), -1, 1) & enemies;
+        auto right = shift_dir(set_bit(sq), -1, 1) & enemies;
         while (right) {
-          const int d = ctz(right);
+          auto d = ctz(right);
           right &= right - 1;
           Move m;
           m.from = sq;
@@ -253,10 +253,10 @@ void gen_pawn_moves(const Board& b, MoveList& out) {
     }
     // En-passant.
     if (b.ep_square >= 0) {
-      const U64 ep_mask = set_bit(b.ep_square);
-      U64 capturers = pawns & (shift_dir(ep_mask, 1, 1) | shift_dir(ep_mask, 1, -1));
+      const auto ep_mask = set_bit(b.ep_square);
+      auto capturers = pawns & (shift_dir(ep_mask, 1, 1) | shift_dir(ep_mask, 1, -1));
       while (capturers) {
-        const int o = ctz(capturers);
+        auto o = ctz(capturers);
         capturers &= capturers - 1;
         Move m;
         m.from = o;
@@ -269,14 +269,14 @@ void gen_pawn_moves(const Board& b, MoveList& out) {
 }
 
 void gen_knight_moves(const Board& b, MoveList& out) {
-  U64 knights = b.masks[piece_index(b.side_to_move, PieceType::Knight)];
-  const U64 own = b.color_mask(b.side_to_move);
+  auto knights = b.masks[piece_index(b.side_to_move, PieceType::Knight)];
+  const auto own = b.color_mask(b.side_to_move);
   while (knights) {
-    const int sq = ctz(knights);
+    auto sq = ctz(knights);
     knights &= knights - 1;
-    U64 dests = knight_attack_mask(set_bit(sq));
+    auto dests = knight_attack_mask(set_bit(sq));
     while (dests) {
-      const int d = ctz(dests);
+      auto d = ctz(dests);
       dests &= dests - 1;
       if (test_bit(own, d)) continue;
       Move m;
@@ -288,14 +288,14 @@ void gen_knight_moves(const Board& b, MoveList& out) {
 }
 
 void gen_king_moves(const Board& b, MoveList& out) {
-  U64 kings = b.masks[piece_index(b.side_to_move, PieceType::King)];
-  const U64 own = b.color_mask(b.side_to_move);
+  auto kings = b.masks[piece_index(b.side_to_move, PieceType::King)];
+  const auto own = b.color_mask(b.side_to_move);
   while (kings) {
-    const int sq = ctz(kings);
+    auto sq = ctz(kings);
     kings &= kings - 1;
-    U64 dests = king_attack_mask(set_bit(sq));
+    auto dests = king_attack_mask(set_bit(sq));
     while (dests) {
-      const int d = ctz(dests);
+      auto d = ctz(dests);
       dests &= dests - 1;
       if (test_bit(own, d)) continue;
       Move m;
@@ -307,15 +307,15 @@ void gen_king_moves(const Board& b, MoveList& out) {
 }
 
 void gen_bishop_moves(const Board& b, MoveList& out) {
-  U64 bishops = b.masks[piece_index(b.side_to_move, PieceType::Bishop)];
-  const U64 occ = b.occupancy();
-  const U64 own = b.color_mask(b.side_to_move);
+  auto bishops = b.masks[piece_index(b.side_to_move, PieceType::Bishop)];
+  const auto occ = b.occupancy();
+  const auto own = b.color_mask(b.side_to_move);
   while (bishops) {
-    const int sq = ctz(bishops);
+    auto sq = ctz(bishops);
     bishops &= bishops - 1;
-    U64 dests = ray_attack_mask(set_bit(sq), occ, kBishopDirs);
+    auto dests = ray_attack_mask(set_bit(sq), occ, kBishopDirs);
     while (dests) {
-      const int d = ctz(dests);
+      auto d = ctz(dests);
       dests &= dests - 1;
       if (test_bit(own, d)) continue;
       Move m;
@@ -327,15 +327,15 @@ void gen_bishop_moves(const Board& b, MoveList& out) {
 }
 
 void gen_rook_moves(const Board& b, MoveList& out) {
-  U64 rooks = b.masks[piece_index(b.side_to_move, PieceType::Rook)];
-  const U64 occ = b.occupancy();
-  const U64 own = b.color_mask(b.side_to_move);
+  auto rooks = b.masks[piece_index(b.side_to_move, PieceType::Rook)];
+  const auto occ = b.occupancy();
+  const auto own = b.color_mask(b.side_to_move);
   while (rooks) {
-    const int sq = ctz(rooks);
+    auto sq = ctz(rooks);
     rooks &= rooks - 1;
-    U64 dests = ray_attack_mask(set_bit(sq), occ, kRookDirs);
+    auto dests = ray_attack_mask(set_bit(sq), occ, kRookDirs);
     while (dests) {
-      const int d = ctz(dests);
+      auto d = ctz(dests);
       dests &= dests - 1;
       if (test_bit(own, d)) continue;
       Move m;
@@ -347,15 +347,15 @@ void gen_rook_moves(const Board& b, MoveList& out) {
 }
 
 void gen_queen_moves(const Board& b, MoveList& out) {
-  U64 queens = b.masks[piece_index(b.side_to_move, PieceType::Queen)];
-  const U64 occ = b.occupancy();
-  const U64 own = b.color_mask(b.side_to_move);
+  auto queens = b.masks[piece_index(b.side_to_move, PieceType::Queen)];
+  const auto occ = b.occupancy();
+  const auto own = b.color_mask(b.side_to_move);
   while (queens) {
-    const int sq = ctz(queens);
+    auto sq = ctz(queens);
     queens &= queens - 1;
-    U64 dests = queen_attack_mask(set_bit(sq), occ);
+    auto dests = queen_attack_mask(set_bit(sq), occ);
     while (dests) {
-      const int d = ctz(dests);
+      auto d = ctz(dests);
       dests &= dests - 1;
       if (test_bit(own, d)) continue;
       Move m;
@@ -367,13 +367,13 @@ void gen_queen_moves(const Board& b, MoveList& out) {
 }
 
 void gen_castling(const Board& b, MoveList& out) {
-  const Color me = b.side_to_move;
-  const Color opp = opponent(me);
+  auto me = b.side_to_move;
+  auto opp = opponent(me);
   if (me == Color::White) {
     if ((b.castling & (Board::kWhiteKingside | Board::kWhiteQueenside)) == 0) return;
     if (!(b.masks[kWhiteKing] & set_bit(4))) return;  // King not on e1.
-    const U64 occ = b.occupancy();
-    const U64 attacked = attacked_by(b, opp);
+    const auto occ = b.occupancy();
+    const auto attacked = attacked_by(b, opp);
     if (test_bit(attacked, 4)) return;  // Cannot castle out of check.
     if ((b.castling & Board::kWhiteKingside) &&
         !test_bit(occ, 5) && !test_bit(occ, 6) &&
@@ -396,8 +396,8 @@ void gen_castling(const Board& b, MoveList& out) {
   } else {
     if ((b.castling & (Board::kBlackKingside | Board::kBlackQueenside)) == 0) return;
     if (!(b.masks[kBlackKing] & set_bit(60))) return;  // King not on e8.
-    const U64 occ = b.occupancy();
-    const U64 attacked = attacked_by(b, opp);
+    const auto occ = b.occupancy();
+    const auto attacked = attacked_by(b, opp);
     if (test_bit(attacked, 60)) return;  // Cannot castle out of check.
     if ((b.castling & Board::kBlackKingside) &&
         !test_bit(occ, 61) && !test_bit(occ, 62) &&
@@ -437,12 +437,12 @@ MoveList generate_pseudo_legal(const Board& b) {
 MoveList generate_moves(const Board& b) {
   MoveList legal;
   const MoveList pseudo = generate_pseudo_legal(b);
-  const Color me = b.side_to_move;
+  auto me = b.side_to_move;
   for (const Move& m : pseudo) {
     Board after = b;
     after.make_move(m);
     // Legal iff the mover's own king is no longer attacked.
-    const U64 my_king_after = after.masks[piece_index(me, PieceType::King)];
+    const auto my_king_after = after.masks[piece_index(me, PieceType::King)];
     if ((attacked_by(after, opponent(me)) & my_king_after) == 0) legal.add(m);
   }
   return legal;
